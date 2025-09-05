@@ -83,6 +83,16 @@ To test this functionality in your cloud computing environment, you can use the 
 - On the [SRA Run Selector page for `SRX512039`](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRX512039&o=acc_s%3Aa), select the two available runs (`SRR1219865` and `SRR1219902`) and click on `JWT Cart` to download a key file called `cart.jwt` that can be directly provided to the pipeline with `--dbgap_key cart.jwt`
 - Click on `Accession List` to download a text file called `SRR_Acc_List.txt` with the SRR IDs that can be directly provided to the pipeline with `--input SRR_Acc_List.txt`
 
+### Trimming with fastp
+
+The pipeline uses `fastp` to perform adapter and quality trimming of sequencing reads. By default, `fastp` is run with its default parameters. You can customize the `fastp` parameters by using the `--fastp_args` parameter.
+
+For example, to specify a minimum length of 50 for the reads, you can use the following command:
+
+```bash
+nextflow run wgs-bact --input ./ids.csv --outdir ./results -profile docker --fastp_args "--length_required 50"
+```
+
 ## Running the pipeline
 
 The typical command for running the pipeline is as follows:

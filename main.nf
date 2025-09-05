@@ -18,6 +18,7 @@ nextflow.enable.dsl = 2
 */
 
 include { SRA                     } from './workflows/sra'
+include { FASTP                   } from './modules/local/fastp/main.nf'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_wgs_bact_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_wgs_bact_pipeline'
 
@@ -41,6 +42,19 @@ workflow WGS_BACT {
     // WORKFLOW: Download FastQ files for SRA / ENA / GEO / DDBJ ids
     //
     SRA ( ids )
+
+    //
+    // MODULE: Run fastp to trim reads
+    //
+    FASTP ( SRA.out.sra_metadata.map { meta ->
+        def reads = []
+        if (meta.single_end) {
+            reads = [ file(meta.fastq_1) ]
+        } else {
+            reads = [ file(meta.fastq_1), file(meta.fastq_2) ]
+        }
+        [ meta, reads ]
+    } )
 
 }
 
@@ -90,4 +104,6 @@ workflow {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     THE END
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+~~~~~~~~~~~~
 */
