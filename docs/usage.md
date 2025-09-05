@@ -1,8 +1,4 @@
-# nf-core/fetchngs: Usage
-
-## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/fetchngs/usage](https://nf-co.re/fetchngs/usage)
-
-> _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
+# wgs-bact: Usage
 
 ## Introduction
 
@@ -24,7 +20,7 @@ If `SRR`/`ERR`/`DRR` run ids are provided then these will be resolved back to th
 
 The final sample information for all identifiers is obtained from the ENA which provides direct download links for FastQ files as well as their associated md5 sums. If download links exist, the files will be downloaded in parallel by FTP. Otherwise they are downloaded using sra-tools.
 
-All of the sample metadata obtained from the ENA will be appended as additional columns to help you manually curate the generated samplesheet before you run the pipeline. You can customise the metadata fields that are appended to the samplesheet via the `--ena_metadata_fields` parameter. The default list of fields used by the pipeline can be found at the top of the [`bin/sra_ids_to_runinfo.py`](https://github.com/nf-core/fetchngs/blob/master/bin/sra_ids_to_runinfo.py) script within the pipeline repo. However, this pipeline requires a minimal set of fields to download FastQ files i.e. `'run_accession,experiment_accession,library_layout,fastq_ftp,fastq_md5'`. A comprehensive list of accepted metadata fields can be obtained from the [ENA API](https://www.ebi.ac.uk/ena/portal/api/returnFields?dataPortal=ena&format=tsv&result=read_run).
+All of the sample metadata obtained from the ENA will be appended as additional columns to help you manually curate the generated samplesheet before you run the pipeline. You can customise the metadata fields that are appended to the samplesheet via the `--ena_metadata_fields` parameter. The default list of fields used by the pipeline can be found at the top of the [`bin/sra_ids_to_runinfo.py`](https://github.com/adamdinan/wgs-bact/blob/master/bin/sra_ids_to_runinfo.py) script within the pipeline repo. However, this pipeline requires a minimal set of fields to download FastQ files i.e. `'run_accession,experiment_accession,library_layout,fastq_ftp,fastq_md5'`. A comprehensive list of accepted metadata fields can be obtained from the [ENA API](https://www.ebi.ac.uk/ena/portal/api/returnFields?dataPortal=ena&format=tsv&result=read_run).
 
 If you have a GEO accession (found in the data availability section of published papers) you can directly download a text file containing the appropriate SRA ids to pass to the pipeline:
 
@@ -68,11 +64,11 @@ SRR9320616_3.fastq
 
 This highlights that there is a discrepancy between the read data hosted on the ENA API and what can actually be fetched from sra-tools, where the latter seems to be the source of truth. If you anticipate that you may have more than 2 FastQ files per sample, it is recommended to use this pipeline with the `--download_method sratools` parameter.
 
-See [issue #260](https://github.com/nf-core/fetchngs/issues/260) for more details.
+See issue #260 for more details.
 
 ### Primary options for downloading data
 
-If the appropriate download links are available, the pipeline uses FTP by default to download FastQ files by setting the `--download_method ftp` parameter. If you are having issues and prefer to use sra-tools or Aspera instead, you can set the [`--download_method`](https://nf-co.re/fetchngs/parameters#download_method) parameter to `--download_method sratools` or `--download_method aspera`, respectively.
+If the appropriate download links are available, the pipeline uses FTP by default to download FastQ files by setting the `--download_method ftp` parameter. If you are having issues and prefer to use sra-tools or Aspera instead, you can set the [`--download_method`](https://github.com/adamdinan/wgs-bact#parameters) parameter to `--download_method sratools` or `--download_method aspera`, respectively.
 
 ### Downloading dbGAP data with JWT
 
@@ -92,7 +88,7 @@ To test this functionality in your cloud computing environment, you can use the 
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/fetchngs --input ./ids.csv --outdir ./results -profile docker
+nextflow run wgs-bact --input ./ids.csv --outdir ./results -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -117,7 +113,7 @@ Do not use `-c <file>` to specify parameters as this will result in errors. Cust
 The above pipeline run specified with a params file in yaml format:
 
 ```bash
-nextflow run nf-core/fetchngs -profile docker -params-file params.yaml
+nextflow run wgs-bact -profile docker -params-file params.yaml
 ```
 
 with `params.yaml` containing:
@@ -135,14 +131,14 @@ You can also generate such `YAML`/`JSON` files via [nf-core/launch](https://nf-c
 When you run the above command, Nextflow automatically pulls the pipeline code from GitHub and stores it as a cached version. When running the pipeline after this, it will always use the cached version if available - even if the pipeline has been updated since. To make sure that you're running the latest version of the pipeline, make sure that you regularly update the cached version of the pipeline:
 
 ```bash
-nextflow pull nf-core/fetchngs
+nextflow pull wgs-bact
 ```
 
 ### Reproducibility
 
 It is a good idea to specify a pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
 
-First, go to the [nf-core/fetchngs releases page](https://github.com/nf-core/fetchngs/releases) and find the latest pipeline version - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`. Of course, you can switch to another version by changing the number after the `-r` flag.
+First, go to the [wgs-bact releases page](https://github.com/adamdinan/wgs-bact/releases) and find the latest pipeline version - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`. Of course, you can switch to another version by changing the number after the `-r` flag.
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, at the bottom of the MultiQC reports.
 
