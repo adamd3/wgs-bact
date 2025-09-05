@@ -1,11 +1,11 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    nf-core/fetchngs
+    wgs-bact
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/nf-core/fetchngs
-    Website: https://nf-co.re/fetchngs
-    Slack  : https://nfcore.slack.com/channels/fetchngs
+    Github : https://github.com/adamdinan/wgs-bact
+    Website: 
+    Slack  : 
 ----------------------------------------------------------------------------------------
 */
 
@@ -18,8 +18,8 @@ nextflow.enable.dsl = 2
 */
 
 include { SRA                     } from './workflows/sra'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_fetchngs_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_fetchngs_pipeline'
+include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_wgs_bact_pipeline'
+include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_wgs_bact_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,9 +28,9 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_fetc
 */
 
 //
-// WORKFLOW: Run main nf-core/fetchngs analysis pipeline depending on type of identifier provided
+// WORKFLOW: Run main wgs-bact analysis pipeline depending on type of identifier provided
 //
-workflow NFCORE_FETCHNGS {
+workflow WGS_BACT {
 
     take:
     ids // channel: database ids read in from --input
@@ -69,7 +69,7 @@ workflow {
     //
     // WORKFLOW: Run primary workflows for the pipeline
     //
-    NFCORE_FETCHNGS (
+    WGS_BACT (
         PIPELINE_INITIALISATION.out.ids
     )
 
