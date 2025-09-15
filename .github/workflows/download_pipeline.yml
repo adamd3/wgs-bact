@@ -10,7 +10,7 @@ on:
       testbranch:
         description: "The specific branch you wish to utilize for the test execution of nf-core download."
         required: true
-        default: "dev"
+        default: "develop"
   pull_request:
     types:
       - opened
@@ -47,13 +47,14 @@ jobs:
         run: |
           echo "REPO_LOWERCASE=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
           echo "REPOTITLE_LOWERCASE=$(basename ${GITHUB_REPOSITORY,,})" >> ${GITHUB_ENV}
-          echo "REPO_BRANCH=${{ github.event.inputs.testbranch || 'dev' }}" >> ${GITHUB_ENV}
+          echo "REPO_BRANCH=${{ github.event.inputs.testbranch || 'develop' }}" >> ${GITHUB_ENV}
 
       - name: Download the pipeline
         env:
           NXF_SINGULARITY_CACHEDIR: ./
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          nf-core download ${{ env.REPO_LOWERCASE }} \
+          nf-core pipelines download ${{ env.REPO_LOWERCASE }} \
           --revision ${{ env.REPO_BRANCH }} \
           --outdir ./${{ env.REPOTITLE_LOWERCASE }} \
           --compress "none" \
