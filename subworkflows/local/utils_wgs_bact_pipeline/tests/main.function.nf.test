@@ -2,8 +2,8 @@
 nextflow_function {
 
     name "Test Functions"
-    script "subworkflows/local/utils_nfcore_fetchngs_pipeline/main.nf"
-    tag "UTILS_NFCORE_FETCHNGS_PIPELINE"
+    script "subworkflows/local/utils_wgs_bact_pipeline/main.nf"
+    tag "UTILS_WGS_BACT_PIPELINE"
 
     test("Function isSraId") {
 
