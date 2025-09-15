@@ -3,13 +3,7 @@ process FASTP {
     label 'process_medium'
 
     conda "bioconda::fastp=0.23.2"
-    container '${
-        if (task.container.toString() ==~ /.*biocontainers.*/) {
-            'biocontainers/fastp:0.23.2--h79da9fb_0' 
-        } else {
-            task.container
-        }
-    }'
+    container "biocontainers/fastp:0.23.2--h79da9fb_0"
 
     input:
     tuple val(meta), path(reads)
@@ -39,7 +33,7 @@ process FASTP {
 
         cat <<-END_VERSIONS > versions.yml
         "${task.process}":
-            fastp: $(fastp --version 2>&1 | sed 's/fastp //')
+            fastp: \$(fastp --version 2>&1 | sed 's/fastp //')
         END_VERSIONS
         """
     } else {
@@ -55,7 +49,7 @@ process FASTP {
 
         cat <<-END_VERSIONS > versions.yml
         "${task.process}":
-            fastp: $(fastp --version 2>&1 | sed 's/fastp //')
+            fastp: \$(fastp --version 2>&1 | sed 's/fastp //')
         END_VERSIONS
         """
     }
