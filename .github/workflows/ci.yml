@@ -32,4 +32,4 @@ jobs:
       - name: Run pipeline with example SRR accession
         run: |
           echo "SRR9984183" > ids.csv
-          nextflow run main.nf -profile docker --input ids.csv --outdir results_srr_test -stub # Use -stub for a quick test without actual data download/processing
+          nextflow run main.nf -profile docker,ci --input ids.csv --outdir results_srr_test -stub # Use -stub for a quick test without actual data download/processing
