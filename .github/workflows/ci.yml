@@ -57,3 +57,36 @@ jobs:
       - name: Check for expected output files
         run: |
           ls -l results_functional_test/fastp/*trimmed.fastq.gz
+
+  test_snippy:
+    name: Run Snippy Test
+    runs-on: ubuntu-latest
+    needs: functional_test # Ensure this runs after the functional test
+    strategy:
+      matrix:
+        NXF_VER:
+          - "latest-everything"
+        profile:
+          - "docker"
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v4
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
+
+      - name: Run pipeline with Snippy
+        run: |
+          echo "SRR9984183" > ids.csv
+          nextflow run main.nf -profile docker,ci \
+            --input ids.csv \
+            --outdir results_snippy_test \
+            --reference_genome tests/test_reference.fasta \
+            -stub # Use -stub for a quick test without actual data download/processing
+
+      - name: Check for Snippy output files
+        run: |
+          ls -l results_snippy_test/snippy/*_snippy/snps.vcf
