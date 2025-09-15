@@ -30,6 +30,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_wgs_bact_pi
 
 //
 // WORKFLOW: Run main wgs-bact analysis pipeline depending on type of identifier provided
+// This is a minor change to trigger CI.
 //
 workflow WGS_BACT {
 
