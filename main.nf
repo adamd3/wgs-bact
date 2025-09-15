@@ -59,21 +59,11 @@ workflow WGS_BACT {
         [ meta, reads ]
     } )
 
-    // Collect FASTP outputs into a single channel for SNIPPY
-    ch_fastp_reads = FASTP.out.reads
-        .map { meta, read_file -> [ meta, [read_file] ] }
-
-    if (FASTP.out.reads_paired.isEmitted()) {
-        ch_fastp_reads = ch_fastp_reads.mix(FASTP.out.reads_paired
-            .map { meta, read1, read2 -> [ meta, [read1, read2] ] }
-        )
-    }
-
     //
     // MODULE: Run Snippy to call variants
     //
     SNIPPY (
-        ch_fastp_reads.map { meta, reads -> [ meta, reads, reference_genome ] }
+        FASTP.out.reads.map { meta, reads -> [ meta, reads, reference_genome ] }
     )
 
 }
