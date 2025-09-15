@@ -35,7 +35,7 @@ mkdir ${prefix}_snippy
             --minqual ${params.snippy_min_qual} \
             --maxsoft ${params.snippy_max_soft} \
             ${args}
-    else
+    elif [ "${reads.size()}" == "2" ]; then
         snippy \
             --outdir ${prefix}_snippy \
             --ref ${reference} \
@@ -49,6 +49,9 @@ mkdir ${prefix}_snippy
             --minqual ${params.snippy_min_qual} \
             --maxsoft ${params.snippy_max_soft} \
             ${args}
+    else
+        echo "Error: Invalid number of reads provided to Snippy. Expected 1 or 2, got ${reads.size()}"
+        exit 1
     fi
 
     cat <<-END_VERSIONS > versions.yml
