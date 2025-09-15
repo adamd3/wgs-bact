@@ -82,7 +82,7 @@ jobs:
           echo tags=$(python \
             .github/python/find_changed_files.py \
             -t pipeline workflow process \
-            -p ${{ steps.changed_files.outputs.all_changed_files }} ${{ steps.changed_files.outputs.changed_keys }} \
+            -p . \
           ) >> $GITHUB_OUTPUT
 
       - name: debug2
