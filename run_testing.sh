@@ -1,1 +1,0 @@
-  PATH=/Users/adamdinan/wgs-bact:$PATH ./nf-test test --profile docker,arm modules/local/fastp/tests/main.nf.test

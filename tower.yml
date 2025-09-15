@@ -3,4 +3,5 @@ reports:
     display: "Auto-created samplesheet with collated metadata and FASTQ paths"
   id_mappings.csv:
     display: "File with database identifier mappings that can be used to rename samples"
-  
+  multiqc_config.yml:
+    display: "MultiQC config file for bulk renaming of sample names from database ids"

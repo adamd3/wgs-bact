@@ -140,7 +140,8 @@ workflow SRA {
     SRA_TO_SAMPLESHEET (
         ch_sra_metadata,
         params.nf_core_pipeline ?: '',
-        params.nf_core_rnaseq_strandedness ?: 'auto'
+        params.nf_core_rnaseq_strandedness ?: 'auto',
+        params.sample_mapping_fields
     )
 
     // Merge samplesheets and mapping files across all samples
@@ -153,18 +154,29 @@ workflow SRA {
         .collectFile(name:'samplesheet.csv', storeDir: "${params.outdir}/samplesheet")
         .set { ch_samplesheet }
 
-    
+    SRA_TO_SAMPLESHEET
+        .out
+        .mappings
+        .map { it[1] }
+        .collectFile(name:'tmp_id_mappings.csv', newLine: true, keepHeader: true, sort: { it.baseName })
+        .map { it.text.tokenize('\n').join('\n') }
+        .collectFile(name:'id_mappings.csv', storeDir: "${params.outdir}/samplesheet")
+        .set { ch_mappings }
 
-    
+    //
+    // MODULE: Create a MutiQC config file with sample name mappings
+    //
+    ch_sample_mappings_yml = Channel.empty()
 
     //
     // Collate and save software versions
     //
     softwareVersionsToYAML(ch_versions)
-        .collectFile(storeDir: "${params.outdir}/pipeline_info", name: 'nf_core_fetchngs_software_versions.yml', sort: true, newLine: true)
+        .collectFile(storeDir: "${params.outdir}/pipeline_info", name: 'nf_core_fetchngs_software_mqc_versions.yml', sort: true, newLine: true)
 
     emit:
     samplesheet     = ch_samplesheet
+    mappings        = ch_mappings
     sra_metadata    = ch_sra_metadata
     versions        = ch_versions.unique()
 }
