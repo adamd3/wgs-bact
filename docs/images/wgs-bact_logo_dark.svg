@@ -1,0 +1,10 @@
+<svg width="500" height="100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .text {
+      font-family: "Arial", sans-serif;
+      font-size: 60px;
+      fill: #fff;
+    }
+  </style>
+  <text x="10" y="70" class="text">WGS-Bact</text>
+</svg>
