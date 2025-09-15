@@ -46,18 +46,6 @@ jobs:
           output_renamed_files_as_deleted_and_added: "true"
           # Define list of additional rules for testing paths
           # Mostly, we define additional 'pipeline' or 'all' tests here
-          files_yaml: |
-            ".":
-              - .github/workflows/**
-              - nf-test.config
-              - nextflow.config
-            tests:
-              - assets/*
-              - bin/*
-              - conf/*
-              - main.nf
-              - nextflow_schema.json
-
           files_ignore: |
             .git*
             .gitpod.yml
