@@ -20,9 +20,16 @@ process SNIPPY {
     def input_reads = reads.join(' --R1 ').replaceFirst(' --R1 ', '') // Handle single-end and paired-end
 
     """
-mkdir ${prefix}_snippy
+    echo "--- SNIPPY Debug Info ---"
+    echo "Input reads: ${reads}"
+    echo "Reads size: ${reads.size()}"
+    echo "Reference: ${reference}"
+    echo "Prefix: ${prefix}"
+
+    mkdir ${prefix}_snippy
 
     if [ "${reads.size()}" == "1" ]; then
+        echo "Running snippy for single-end reads..."
         snippy \
             --outdir ${prefix}_snippy \
             --ref ${reference} \
@@ -36,6 +43,7 @@ mkdir ${prefix}_snippy
             --maxsoft ${params.snippy_max_soft} \
             ${args}
     elif [ "${reads.size()}" == "2" ]; then
+        echo "Running snippy for paired-end reads..."
         snippy \
             --outdir ${prefix}_snippy \
             --ref ${reference} \
@@ -54,9 +62,17 @@ mkdir ${prefix}_snippy
         exit 1
     fi
 
+    if [ ! -d "${prefix}_snippy" ] || [ ! -f "${prefix}_snippy/snps.vcf" ]; then
+        echo "Error: Snippy output directory or snps.vcf not found!"
+        exit 1
+    fi
+    echo "Snippy output directory: ${prefix}_snippy"
+    ls -l ${prefix}_snippy
+
+    echo "--- End SNIPPY Debug Info ---"
+
     cat <<-END_VERSIONS > versions.yml
     "SNIPPY":
         snippy: 
     END_VERSIONS
     """
-}
