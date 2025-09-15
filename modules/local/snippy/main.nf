@@ -4,8 +4,8 @@ process SNIPPY {
 
     conda (params.enable_conda ? "bioconda::snippy=4.6.0" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/snippy:4.6.0--hdfd78af_0' :
-        'quay.io/biocontainers/snippy:4.6.0--hdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/snippy:4.6.0--hdfd78af_1' :
+        'quay.io/biocontainers/snippy:4.6.0--hdfd78af_1' }"
 
     input:
     tuple val(meta), path(reads), path(reference)
