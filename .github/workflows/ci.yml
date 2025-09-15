@@ -13,7 +13,6 @@ jobs:
           - "latest-everything" # Test with the latest Nextflow version
         profile:
           - "docker" # Run tests using the docker profile
-        tags: ["pipeline"] # Explicitly run only the 'pipeline' test
 
     steps:
       - name: Check out pipeline code
@@ -24,11 +23,37 @@ jobs:
         with:
           version: "${{ matrix.NXF_VER }}"
 
-      - name: Install nf-test
-        run: | # Install nf-test directly
-          wget -qO- https://code.askimed.com/install/nf-test | bash
-          sudo mv nf-test /usr/local/bin/
+      - name: Run pipeline with example SRR accession
+        run: |
+          echo "SRR9984183" > ids.csv
+          nextflow run main.nf -profile docker,ci --input ids.csv --outdir results_srr_test -stub # Use -stub for a quick test without actual data download/processing
 
-      - name: Run nf-test
-        run: | # Execute the pipeline test
-          nf-test test --verbose --tag ${{ matrix.tags }} --profile "+${{ matrix.profile }}"
+  functional_test:
+    name: Run Functional Test
+    runs-on: ubuntu-latest
+    needs: test # Ensure this runs after the stubbed test
+    strategy:
+      matrix:
+        NXF_VER:
+          - "latest-everything"
+        profile:
+          - "docker"
+
+    steps:
+      - name: Check out pipeline code
+        uses: actions/checkout@v4
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v1
+        with:
+          version: "${{ matrix.NXF_VER }}"
+
+      - name: Run pipeline with test dataset
+        run: |
+          nextflow run main.nf \
+            -profile ${{ matrix.profile }},test \
+            --outdir results_functional_test
+
+      - name: Check for expected output files
+        run: |
+          ls -l results_functional_test/fastp/*trimmed.fastq.gz
