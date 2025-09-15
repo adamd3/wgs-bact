@@ -59,13 +59,23 @@ workflow WGS_BACT {
         [ meta, reads ]
     } )
 
-    // Combine FASTP outputs into a single channel for SNIPPY
-    ch_fastp_reads = FASTP.out.reads
-        .map { meta, read_file -> [ meta, [read_file] ] }
-        .mix(FASTP.out.reads_paired
-            .map { meta, read1, read2 -> [ meta, [read1, read2] ] }
-            .ifEmpty { Channel.empty() } // Ensure reads_paired is always a channel, even if empty
-        )
+    // Branch FASTP outputs based on single_end flag
+    FASTP.out.reads
+        .branch { meta, read_file ->
+            single_end: meta.single_end
+                return [ meta, [read_file] ]
+        }
+        .set { ch_fastp_single_end }
+
+    FASTP.out.reads_paired
+        .branch { meta, read1, read2 ->
+            paired_end: !meta.single_end
+                return [ meta, [read1, read2] ]
+        }
+        .set { ch_fastp_paired_end }
+
+    // Combine branched FASTP outputs into a single channel for SNIPPY
+    ch_fastp_reads = ch_fastp_single_end.single_end.mix(ch_fastp_paired_end.paired_end)
 
     //
     // MODULE: Run Snippy to call variants
