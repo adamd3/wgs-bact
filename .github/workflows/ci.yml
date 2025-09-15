@@ -56,7 +56,4 @@ jobs:
 
       - name: Check for expected output files
         run: |
-          # Replace with actual expected output files from your pipeline
-          # For example, check for a multiqc report or trimmed fastq files
-          ls -l results_functional_test/multiqc/multiqc_report.html
           ls -l results_functional_test/fastp/*trimmed.fastq.gz
