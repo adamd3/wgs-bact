@@ -8,10 +8,9 @@ nextflow_pipeline {
 
         when {
             pipeline {
-                params {
-                    input = 'SRR9984183'
-                    profile = 'test'
-                }
+                """
+                --input 'SRR9984183' -profile test
+                """
             }
         }
 
