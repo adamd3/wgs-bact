@@ -10,7 +10,10 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "required": [
+                "input",
+                "outdir"
+            ],
             "properties": {
                 "input": {
                     "type": "string",
@@ -41,12 +44,18 @@
             "description": "Options specific to the wgs-bact pipeline.",
             "properties": {
                 "reference_genome": {
-                    "type": ["string", "null"],
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "format": "file-path",
                     "description": "Path to the reference genome file."
                 },
                 "fastp_args": {
-                    "type": ["string", "null"],
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "description": "Extra arguments to pass to fastp."
                 },
                 "enable_conda": {
@@ -78,7 +87,10 @@
                     "description": "Maximum soft-clipped bases for Snippy."
                 },
                 "snippy_args": {
-                    "type": ["string", "null"],
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "description": "Extra arguments to pass to Snippy."
                 }
             }
@@ -105,11 +117,21 @@
                     "type": "string",
                     "default": "copy",
                     "description": "Method used to save pipeline results to output directory.",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
                     "hidden": true
                 },
                 "email_on_fail": {
-                    "type": ["string", "null"],
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "description": "Email address for completion summary, only when pipeline fails.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.(.[a-zA-Z]{2,5})$",
                     "hidden": true
@@ -125,7 +147,10 @@
                     "hidden": true
                 },
                 "hook_url": {
-                    "type": ["string", "null"],
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "description": "Incoming hook URL for messaging service",
                     "hidden": true
                 },
