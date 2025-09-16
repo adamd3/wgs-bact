@@ -143,7 +143,7 @@
                 "max_time": {
                     "type": "string",
                     "description": "Maximum amount of time that can be requested for any single job.",
-                    "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+""
+                    "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+"
                 }
             }
         },
