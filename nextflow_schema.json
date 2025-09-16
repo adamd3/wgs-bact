@@ -10,10 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": [
-                "input",
-                "outdir"
-            ],
+            "required": ["input", "outdir"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -37,6 +34,49 @@
                 }
             }
         },
+        "fetchngs_options": {
+            "title": "fetchngs options",
+            "type": "object",
+            "description": "Options for fetching data from public archives.",
+            "properties": {
+                "nf_core_pipeline": {
+                    "type": ["string", "null"],
+                    "description": "Name of supported nf-core pipeline e.g. 'rnaseq'."
+                },
+                "nf_core_rnaseq_strandedness": {
+                    "type": "string",
+                    "default": "auto",
+                    "description": "Value for 'strandedness' entry for nf-core/rnaseq."
+                },
+                "ena_metadata_fields": {
+                    "type": ["string", "null"],
+                    "description": "Comma-separated list of ENA metadata fields to fetch."
+                },
+                "sample_mapping_fields": {
+                    "type": "string",
+                    "description": "Comma-separated list of ENA metadata fields for sample mapping."
+                },
+                "download_method": {
+                    "type": "string",
+                    "default": "ftp",
+                    "enum": ["aspera", "ftp", "sratools"],
+                    "description": "Method to download FastQ files."
+                },
+                "skip_fastq_download": {
+                    "type": "boolean",
+                    "description": "Only download metadata and skip FastQ download."
+                },
+                "dbgap_key": {
+                    "type": ["string", "null"],
+                    "format": "file-path",
+                    "description": "dbGaP repository key."
+                },
+                "force_sratools_download": {
+                    "type": "boolean",
+                    "description": "Force download using sra-tools."
+                }
+            }
+        },
         "wgs_bact_options": {
             "title": "wgs-bact options",
             "type": "object",
@@ -44,18 +84,12 @@
             "description": "Options specific to the wgs-bact pipeline.",
             "properties": {
                 "reference_genome": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "format": "file-path",
                     "description": "Path to the reference genome file."
                 },
                 "fastp_args": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "description": "Extra arguments to pass to fastp."
                 },
                 "enable_conda": {
@@ -87,11 +121,29 @@
                     "description": "Maximum soft-clipped bases for Snippy."
                 },
                 "snippy_args": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "description": "Extra arguments to pass to Snippy."
+                }
+            }
+        },
+        "max_job_request_options": {
+            "title": "Max job request options",
+            "type": "object",
+            "description": "Set the top limit for requested resources for any single job.",
+            "properties": {
+                "max_cpus": {
+                    "type": "integer",
+                    "description": "Maximum number of CPUs that can be requested for any single job."
+                },
+                "max_memory": {
+                    "type": "string",
+                    "description": "Maximum amount of memory that can be requested for any single job.",
+                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$"
+                },
+                "max_time": {
+                    "type": "string",
+                    "description": "Maximum amount of time that can be requested for any single job.",
+                    "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+""
                 }
             }
         },
@@ -117,21 +169,11 @@
                     "type": "string",
                     "default": "copy",
                     "description": "Method used to save pipeline results to output directory.",
-                    "enum": [
-                        "symlink",
-                        "rellink",
-                        "link",
-                        "copy",
-                        "copyNoFollow",
-                        "move"
-                    ],
+                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
                     "hidden": true
                 },
                 "email_on_fail": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "description": "Email address for completion summary, only when pipeline fails.",
                     "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.(.[a-zA-Z]{2,5})$",
                     "hidden": true
@@ -147,10 +189,7 @@
                     "hidden": true
                 },
                 "hook_url": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "description": "Incoming hook URL for messaging service",
                     "hidden": true
                 },
@@ -183,7 +222,13 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
+            "$ref": "#/definitions/fetchngs_options"
+        },
+        {
             "$ref": "#/definitions/wgs_bact_options"
+        },
+        {
+            "$ref": "#/definitions/max_job_request_options"
         },
         {
             "$ref": "#/definitions/generic_options"
