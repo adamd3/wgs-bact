@@ -137,7 +137,7 @@
                 },
                 "validationShowHiddenParams": {
                     "type": "boolean",
-                    "description": "Show all params when using \`--help`",
+                    "description": "Show all params when using ` --help`",
                     "hidden": true
                 },
                 "validationFailUnrecognisedParams": {
