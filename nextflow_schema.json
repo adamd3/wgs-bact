@@ -121,8 +121,9 @@
                     "description": "Maximum soft-clipped bases for Snippy."
                 },
                 "snippy_args": {
-                    "type": ["string", "null"],
-                    "description": "Extra arguments to pass to Snippy."
+                    "type": "string",
+                    "description": "Extra arguments to pass to Snippy.",
+                    "default": ""
                 }
             }
         },
