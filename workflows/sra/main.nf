@@ -4,7 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { MULTIQC_MAPPINGS_CONFIG } from '../../modules/local/multiqc_mappings_config'
+
 include { SRA_FASTQ_FTP           } from '../../modules/local/sra_fastq_ftp'
 include { SRA_IDS_TO_RUNINFO      } from '../../modules/local/sra_ids_to_runinfo'
 include { SRA_RUNINFO_TO_FTP      } from '../../modules/local/sra_runinfo_to_ftp'
@@ -167,13 +167,6 @@ workflow SRA {
     // MODULE: Create a MutiQC config file with sample name mappings
     //
     ch_sample_mappings_yml = Channel.empty()
-    if (params.sample_mapping_fields) {
-        MULTIQC_MAPPINGS_CONFIG (
-            ch_mappings
-        )
-        ch_versions = ch_versions.mix(MULTIQC_MAPPINGS_CONFIG.out.versions)
-        ch_sample_mappings_yml = MULTIQC_MAPPINGS_CONFIG.out.yml
-    }
 
     //
     // Collate and save software versions
@@ -184,7 +177,6 @@ workflow SRA {
     emit:
     samplesheet     = ch_samplesheet
     mappings        = ch_mappings
-    sample_mappings = ch_sample_mappings_yml
     sra_metadata    = ch_sra_metadata
     versions        = ch_versions.unique()
 }

@@ -1,11 +1,11 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    nf-core/fetchngs
+    wgs-bact
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/nf-core/fetchngs
-    Website: https://nf-co.re/fetchngs
-    Slack  : https://nfcore.slack.com/channels/fetchngs
+    Github : https://github.com/adamdinan/wgs-bact
+    Website: 
+    Slack  : 
 ----------------------------------------------------------------------------------------
 */
 
@@ -18,8 +18,9 @@ nextflow.enable.dsl = 2
 */
 
 include { SRA                     } from './workflows/sra'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_fetchngs_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_fetchngs_pipeline'
+include { FASTP                   } from './modules/local/fastp/main.nf'
+include { SNIPPY                  } from './modules/local/snippy'
+include { PIPELINE_INITIALISATION; PIPELINE_COMPLETION } from './subworkflows/local/utils_wgs_bact_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,12 +29,14 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_fetc
 */
 
 //
-// WORKFLOW: Run main nf-core/fetchngs analysis pipeline depending on type of identifier provided
+// WORKFLOW: Run main wgs-bact analysis pipeline depending on type of identifier provided
+// This is a minor change to trigger CI.
 //
-workflow NFCORE_FETCHNGS {
+workflow WGS_BACT {
 
     take:
     ids // channel: database ids read in from --input
+    reference_genome // path: reference genome file
 
     main:
 
@@ -41,6 +44,26 @@ workflow NFCORE_FETCHNGS {
     // WORKFLOW: Download FastQ files for SRA / ENA / GEO / DDBJ ids
     //
     SRA ( ids )
+
+    //
+    // MODULE: Run fastp to trim reads
+    //
+    FASTP ( SRA.out.sra_metadata.map { meta ->
+        def reads = []
+        if (meta.single_end) {
+            reads = [ file(meta.fastq_1) ]
+        } else {
+            reads = [ file(meta.fastq_1), file(meta.fastq_2) ]
+        }
+        [ meta, reads ]
+    } )
+
+    //
+    // MODULE: Run Snippy to call variants
+    //
+    SNIPPY (
+        FASTP.out.reads.map { meta, reads -> [ meta, reads, reference_genome ] }
+    )
 
 }
 
@@ -69,8 +92,9 @@ workflow {
     //
     // WORKFLOW: Run primary workflows for the pipeline
     //
-    NFCORE_FETCHNGS (
-        PIPELINE_INITIALISATION.out.ids
+    WGS_BACT (
+        PIPELINE_INITIALISATION.out.ids,
+        file(params.reference_genome)
     )
 
     //

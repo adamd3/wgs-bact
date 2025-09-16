@@ -11,7 +11,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - Download FastQ files and create samplesheet from [SRA / ENA / DDBJ / GEO ids](#sra--ena--ddbj--geo-ids)
 - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
-Please see the [usage documentation](https://nf-co.re/fetchngs/usage#introduction) for a list of supported public repository identifiers and how to provide them to the pipeline.
+Please see the [usage documentation](https://github.com/adamdinan/wgs-bact#usage) for a list of supported public repository identifiers and how to provide them to the pipeline.
 
 ### SRA / ENA / DDBJ / GEO ids
 
