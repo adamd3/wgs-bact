@@ -32,6 +32,7 @@ process SNIPPY {
         echo "Running snippy for single-end reads..."
         snippy \
             --outdir ${prefix}_snippy \
+            --force \
             --ref ${reference} \
             --se ${reads[0]} \
             --cpus ${task.cpus} \
@@ -46,6 +47,7 @@ process SNIPPY {
         echo "Running snippy for paired-end reads..."
         snippy \
             --outdir ${prefix}_snippy \
+            --force \
             --ref ${reference} \
             --R1 ${reads[0]} \
             --R2 ${reads[1]} \
