@@ -46,8 +46,9 @@ Now, you can run the pipeline using:
 
 ```bash
 nextflow run nf-core/fetchngs \
-   -profile <docker/singularity/.../institute> \
+   -profile <docker/singularity/conda> \
    --input ids.csv \
+   --reference_genome ref.fasta \
    --outdir <OUTDIR>
 ```
 
