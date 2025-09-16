@@ -20,8 +20,7 @@ nextflow.enable.dsl = 2
 include { SRA                     } from './workflows/sra'
 include { FASTP                   } from './modules/local/fastp/main.nf'
 include { SNIPPY                  } from './modules/local/snippy'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_wgs_bact_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_wgs_bact_pipeline'
+include { PIPELINE_INITIALISATION; PIPELINE_COMPLETION } from './subworkflows/local/utils_wgs_bact_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
