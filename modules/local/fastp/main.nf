@@ -68,5 +68,5 @@ process FASTP {
     "${task.process}":
         fastp: 
     END_VERSIONS
-    ""
+    """
 }
