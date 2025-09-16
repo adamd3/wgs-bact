@@ -19,8 +19,8 @@ nextflow.enable.dsl = 2
 
 include { SRA                     } from './workflows/sra'
 include { FASTP                   } from './modules/local/fastp/main.nf'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_wgs_bact_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_wgs_bact_pipeline'
+include { SNIPPY                  } from './modules/local/snippy'
+include { PIPELINE_INITIALISATION; PIPELINE_COMPLETION } from './subworkflows/local/utils_wgs_bact_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,6 +36,7 @@ workflow WGS_BACT {
 
     take:
     ids // channel: database ids read in from --input
+    reference_genome // path: reference genome file
 
     main:
 
@@ -56,6 +57,13 @@ workflow WGS_BACT {
         }
         [ meta, reads ]
     } )
+
+    //
+    // MODULE: Run Snippy to call variants
+    //
+    SNIPPY (
+        FASTP.out.reads.map { meta, reads -> [ meta, reads, reference_genome ] }
+    )
 
 }
 
@@ -85,7 +93,8 @@ workflow {
     // WORKFLOW: Run primary workflows for the pipeline
     //
     WGS_BACT (
-        PIPELINE_INITIALISATION.out.ids
+        PIPELINE_INITIALISATION.out.ids,
+        file(params.reference_genome)
     )
 
     //
