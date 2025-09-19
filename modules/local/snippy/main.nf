@@ -8,7 +8,7 @@ process SNIPPY {
         'quay.io/biocontainers/snippy:4.6.0--hdfd78af_1' }"
 
     input:
-    tuple val(meta), path(reads), path(reference)
+    tuple val(meta), path(reads, stageAs: 'reads/*'), path(reference)
 
     output:
     tuple val(meta), path("${meta.id}_snippy") , emit: snippy_results
