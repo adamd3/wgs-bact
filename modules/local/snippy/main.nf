@@ -84,3 +84,4 @@ process SNIPPY {
     "SNIPPY":
         snippy:
     END_VERSIONS
+    """
