@@ -43,7 +43,7 @@ process SNIPPY {
             --minqual ${params.snippy_min_qual} \
             --maxsoft ${params.snippy_max_soft} \
             ${args} 2>&1 | tee snippy_output.log
-        if [ $? -ne 0 ]; then
+        if [ \$? -ne 0 ]; then
             echo "Error: Snippy command failed. See snippy_output.log for details."
             cat snippy_output.log
             exit 1
@@ -64,7 +64,7 @@ process SNIPPY {
             --minqual ${params.snippy_min_qual} \
             --maxsoft ${params.snippy_max_soft} \
             ${args} 2>&1 | tee snippy_output.log
-        if [ $? -ne 0 ]; then
+        if [ \$? -ne 0 ]; then
             echo "Error: Snippy command failed. See snippy_output.log for details."
             cat snippy_output.log
             exit 1
