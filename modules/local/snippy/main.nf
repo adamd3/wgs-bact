@@ -1,3 +1,4 @@
+
 process SNIPPY {
     tag "${meta.id}"
     label 'process_high' // Snippy can be resource intensive
@@ -8,7 +9,7 @@ process SNIPPY {
         'quay.io/biocontainers/snippy:4.6.0--hdfd78af_1' }"
 
     input:
-    tuple val(meta), path(reads), path(reference)
+    tuple val(meta), path(reads_list), path(reference)
 
     output:
     tuple val(meta), path("${meta.id}_snippy") , emit: snippy_results
@@ -17,12 +18,10 @@ process SNIPPY {
     script:
     def args = task.ext.args ?: params.snippy_args
     def prefix = task.ext.prefix ?: meta.id
-    def input_reads = reads.join(' --R1 ').replaceFirst(' --R1 ', '') // Handle single-end and paired-end
 
     """
-    read_files=(${reads})
     echo "--- SNIPPY Debug Info ---"
-    echo "Input reads: ${reads}"
+    echo "Input reads: ${reads_list}"
     echo "Reference: ${reference}"
     echo "Prefix: ${prefix}"
 
@@ -34,7 +33,7 @@ process SNIPPY {
             --outdir ${prefix}_snippy \
             --force \
             --ref ${reference} \
-            --se "\${read_files[0]}" \
+            --se "${reads_list[0]}" \
             --cpus ${task.cpus} \
             --mapqual ${params.snippy_min_mapqual} \
             --basequal ${params.snippy_min_basequal} \
@@ -54,8 +53,8 @@ process SNIPPY {
             --outdir ${prefix}_snippy \
             --force \
             --ref ${reference} \
-            --R1 "\${read_files[0]}" \
-            --R2 "\${read_files[1]}" \
+            --R1 "${reads_list[0]}" \
+            --R2 "${reads_list[1]}" \
             --cpus ${task.cpus} \
             --mapqual ${params.snippy_min_mapqual} \
             --basequal ${params.snippy_min_basequal} \
