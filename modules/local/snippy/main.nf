@@ -42,7 +42,12 @@ process SNIPPY {
             --minfrac ${params.snippy_min_frac} \
             --minqual ${params.snippy_min_qual} \
             --maxsoft ${params.snippy_max_soft} \
-            ${args}
+            ${args} 2>&1 | tee snippy_output.log
+        if [ $? -ne 0 ]; then
+            echo "Error: Snippy command failed. See snippy_output.log for details."
+            cat snippy_output.log
+            exit 1
+        fi
     elif [ "${reads.size()}" == "2" ]; then
         echo "Running snippy for paired-end reads..."
         snippy \
@@ -58,7 +63,12 @@ process SNIPPY {
             --minfrac ${params.snippy_min_frac} \
             --minqual ${params.snippy_min_qual} \
             --maxsoft ${params.snippy_max_soft} \
-            ${args}
+            ${args} 2>&1 | tee snippy_output.log
+        if [ $? -ne 0 ]; then
+            echo "Error: Snippy command failed. See snippy_output.log for details."
+            cat snippy_output.log
+            exit 1
+        fi
     else
         echo "Error: Invalid number of reads provided to Snippy. Expected 1 or 2, got ${reads.size()}"
         exit 1
