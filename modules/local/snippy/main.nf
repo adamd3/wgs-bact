@@ -70,18 +70,4 @@ process SNIPPY {
             exit 1
         fi
     fi
-
-    if [ ! -d "${prefix}_snippy" ] || [ ! -f "${prefix}_snippy/snps.vcf" ]; then
-        echo "Error: Snippy output directory or snps.vcf not found!"
-        exit 1
-    fi
-    echo "Snippy output directory: ${prefix}_snippy"
-    ls -l ${prefix}_snippy
-
-    echo "--- End SNIPPY Debug Info ---"
-
-    cat <<-END_VERSIONS > versions.yml
-    "SNIPPY":
-        snippy:
-    END_VERSIONS
     """
