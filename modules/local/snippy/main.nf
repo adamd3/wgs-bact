@@ -20,17 +20,15 @@ process SNIPPY {
     def input_reads = reads.join(' --R1 ').replaceFirst(' --R1 ', '') // Handle single-end and paired-end
 
     """
-    cat <<-SCRIPT_BLOCK
     read_files=(${reads})
     echo "--- SNIPPY Debug Info ---"
     echo "Input reads: ${reads}"
-    echo "Reads size: \${#read_files[@]}"
     echo "Reference: ${reference}"
     echo "Prefix: ${prefix}"
 
     mkdir ${prefix}_snippy
 
-    if [ "\${#read_files[@]}" == "1" ]; then
+    if ${meta.single_end}; then
         echo "Running snippy for single-end reads..."
         snippy \
             --outdir ${prefix}_snippy \
@@ -50,7 +48,7 @@ process SNIPPY {
             cat snippy_output.log
             exit 1
         fi
-    elif [ "\${#read_files[@]}" == "2" ]; then
+    else
         echo "Running snippy for paired-end reads..."
         snippy \
             --outdir ${prefix}_snippy \
@@ -71,9 +69,6 @@ process SNIPPY {
             cat snippy_output.log
             exit 1
         fi
-    else
-        echo "Error: Invalid number of reads provided to Snippy. Expected 1 or 2, got \${#read_files[@]}"
-        exit 1
     fi
 
     if [ ! -d "${prefix}_snippy" ] || [ ! -f "${prefix}_snippy/snps.vcf" ]; then
@@ -89,5 +84,3 @@ process SNIPPY {
     "SNIPPY":
         snippy:
     END_VERSIONS
-    SCRIPT_BLOCK
-    """
