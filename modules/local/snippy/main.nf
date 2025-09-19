@@ -1,4 +1,3 @@
-
 process SNIPPY {
     tag "${meta.id}"
     label 'process_high' // Snippy can be resource intensive
@@ -29,18 +28,18 @@ process SNIPPY {
 
     if ${meta.single_end}; then
         echo "Running snippy for single-end reads..."
-        snippy \
-            --outdir ${prefix}_snippy \
-            --force \
-            --ref ${reference} \
-            --se "${reads_list[0]}" \
-            --cpus ${task.cpus} \
-            --mapqual ${params.snippy_min_mapqual} \
-            --basequal ${params.snippy_min_basequal} \
-            --mincov ${params.snippy_min_coverage} \
-            --minfrac ${params.snippy_min_frac} \
-            --minqual ${params.snippy_min_qual} \
-            --maxsoft ${params.snippy_max_soft} \
+        snippy \\
+            --outdir ${prefix}_snippy \\
+            --force \\
+            --ref ${reference} \\
+            --se "${reads_list[0]}" \\
+            --cpus ${task.cpus} \\
+            --mapqual ${params.snippy_min_mapqual} \\
+            --basequal ${params.snippy_min_basequal} \\
+            --mincov ${params.snippy_min_coverage} \\
+            --minfrac ${params.snippy_min_frac} \\
+            --minqual ${params.snippy_min_qual} \\
+            --maxsoft ${params.snippy_max_soft} \\
             ${args} 2>&1 | tee snippy_output.log
         if [ \$? -ne 0 ]; then
             echo "Error: Snippy command failed. See snippy_output.log for details."
@@ -49,19 +48,19 @@ process SNIPPY {
         fi
     else
         echo "Running snippy for paired-end reads..."
-        snippy \
-            --outdir ${prefix}_snippy \
-            --force \
-            --ref ${reference} \
-            --R1 "${reads_list[0]}" \
-            --R2 "${reads_list[1]}" \
-            --cpus ${task.cpus} \
-            --mapqual ${params.snippy_min_mapqual} \
-            --basequal ${params.snippy_min_basequal} \
-            --mincov ${params.snippy_min_coverage} \
-            --minfrac ${params.snippy_min_frac} \
-            --minqual ${params.snippy_min_qual} \
-            --maxsoft ${params.snippy_max_soft} \
+        snippy \\
+            --outdir ${prefix}_snippy \\
+            --force \\
+            --ref ${reference} \\
+            --R1 "${reads_list[0]}" \\
+            --R2 "${reads_list[1]}" \\
+            --cpus ${task.cpus} \\
+            --mapqual ${params.snippy_min_mapqual} \\
+            --basequal ${params.snippy_min_basequal} \\
+            --mincov ${params.snippy_min_coverage} \\
+            --minfrac ${params.snippy_min_frac} \\
+            --minqual ${params.snippy_min_qual} \\
+            --maxsoft ${params.snippy_max_soft} \\
             ${args} 2>&1 | tee snippy_output.log
         if [ \$? -ne 0 ]; then
             echo "Error: Snippy command failed. See snippy_output.log for details."
@@ -72,6 +71,7 @@ process SNIPPY {
 
     cat <<-END_VERSIONS > versions.yml
     "SNIPPY":
-        snippy:
+        snippy: \$(snippy --version | sed 's/^.*version //')
     END_VERSIONS
     """
+}
