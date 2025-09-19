@@ -23,13 +23,13 @@ process SNIPPY {
     read_files=(${reads})
     echo "--- SNIPPY Debug Info ---"
     echo "Input reads: ${reads}"
-    echo "Reads size: ${#read_files[@]}"
+    echo "Reads size: \${#read_files[@]}"
     echo "Reference: ${reference}"
     echo "Prefix: ${prefix}"
 
     mkdir ${prefix}_snippy
 
-    if [ "${#read_files[@]}" == "1" ]; then
+    if [ "\${#read_files[@]}" == "1" ]; then
         echo "Running snippy for single-end reads..."
         snippy \
             --outdir ${prefix}_snippy \
@@ -49,7 +49,7 @@ process SNIPPY {
             cat snippy_output.log
             exit 1
         fi
-    elif [ "${#read_files[@]}" == "2" ]; then
+    elif [ "\${#read_files[@]}" == "2" ]; then
         echo "Running snippy for paired-end reads..."
         snippy \
             --outdir ${prefix}_snippy \
@@ -71,7 +71,7 @@ process SNIPPY {
             exit 1
         fi
     else
-        echo "Error: Invalid number of reads provided to Snippy. Expected 1 or 2, got ${#read_files[@]}"
+        echo "Error: Invalid number of reads provided to Snippy. Expected 1 or 2, got \${#read_files[@]}"
         exit 1
     fi
 
