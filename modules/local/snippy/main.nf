@@ -20,6 +20,7 @@ process SNIPPY {
     def input_reads = reads.join(' --R1 ').replaceFirst(' --R1 ', '') // Handle single-end and paired-end
 
     """
+    cat <<-SCRIPT_BLOCK
     read_files=(${reads})
     echo "--- SNIPPY Debug Info ---"
     echo "Input reads: ${reads}"
@@ -35,7 +36,7 @@ process SNIPPY {
             --outdir ${prefix}_snippy \
             --force \
             --ref ${reference} \
-            --se "${read_files[0]}" \
+            --se "\${read_files[0]}" \
             --cpus ${task.cpus} \
             --mapqual ${params.snippy_min_mapqual} \
             --basequal ${params.snippy_min_basequal} \
@@ -55,8 +56,8 @@ process SNIPPY {
             --outdir ${prefix}_snippy \
             --force \
             --ref ${reference} \
-            --R1 "${read_files[0]}" \
-            --R2 "${read_files[1]}" \
+            --R1 "\${read_files[0]}" \
+            --R2 "\${read_files[1]}" \
             --cpus ${task.cpus} \
             --mapqual ${params.snippy_min_mapqual} \
             --basequal ${params.snippy_min_basequal} \
@@ -86,6 +87,7 @@ process SNIPPY {
 
     cat <<-END_VERSIONS > versions.yml
     "SNIPPY":
-        snippy: 
+        snippy:
     END_VERSIONS
-    """}
+    SCRIPT_BLOCK
+    """
