@@ -70,4 +70,9 @@ process SNIPPY {
             exit 1
         fi
     fi
+
+    cat <<-END_VERSIONS > versions.yml
+    "SNIPPY":
+        snippy:
+    END_VERSIONS
     """
