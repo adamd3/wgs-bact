@@ -1,6 +1,6 @@
 ## Introduction
 
-**WGS-Bact** is a nextflow pipeline for processing Bacterial whole genome sequencing (WGS) data. The pipeline is built on top of [fetchngs](https://github.com/adamd3/wgs-bact).
+**WGS-Bact** is a nextflow pipeline for processing Bacterial whole genome sequencing (WGS) data. The pipeline is built on top of [fetchngs](https://github.com/nf-core/fetchngs).
 
 ## Usage
 
@@ -25,7 +25,7 @@ Each line represents a database id. Please see next section for supported ids.
 Now, you can run the pipeline using:
 
 ```bash
-nextflow run nf-core/fetchngs \
+nextflow run adamd3/wgs-bact \
    -profile <docker/singularity/conda> \
    --input ids.csv \
    --reference_genome ref.fasta \
