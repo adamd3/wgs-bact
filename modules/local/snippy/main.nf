@@ -8,15 +8,15 @@ process SNIPPY {
         'quay.io/biocontainers/snippy:4.6.0--hdfd78af_1' }"
 
     input:
-    tuple val(meta), path(reads_list), path(reference)
+    tuple val(meta), path(reads_list), path(reference), val(suffix)
 
     output:
-    tuple val(meta), path("${meta.id}_snippy") , emit: snippy_results
+    tuple val(meta), path("${meta.id}${suffix ? '_' + suffix : ''}_snippy") , emit: snippy_results
     path "versions.yml"                       , emit: versions
 
     script:
     def args = task.ext.args ?: params.snippy_args
-    def prefix = task.ext.prefix ?: meta.id
+    def prefix = task.ext.prefix ?: "${meta.id}${suffix ? '_' + suffix : ''}"
 
     """
     echo "--- SNIPPY Debug Info ---"
