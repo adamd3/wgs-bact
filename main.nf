@@ -87,7 +87,11 @@ workflow WGS_BACT {
             }
             // Ensure meta.single_end is correctly set for the merged sample
             meta.single_end = single_end
-            [ meta, [r1_files, r2_files] ]
+            if (single_end) {
+                [ meta, r1_files ]
+            } else {
+                [ meta, r1_files, r2_files ]
+            }
         }
         .set { grouped_reads_for_merging }
 
