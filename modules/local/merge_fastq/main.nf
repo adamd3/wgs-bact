@@ -18,7 +18,7 @@ process MERGE_FASTQ {
     def prefix = meta.sample_accession
     if (meta.single_end) {
         """
-        cat $(echo ${reads.join(' ')} | tr ' ' '\n' | sort -V | tr '\n' ' ') > ${prefix}.fastq.gz
+        cat \$(echo ${reads.join(' ')} | tr ' ' '\\n' | sort -V | tr '\\n' ' ') > ${prefix}.fastq.gz
         cat <<-END_VERSIONS > versions.yml
         "${task.process}":
             fastp: $$(fastp --version 2>&1 | sed '1!d' | sed 's/^fastp //g')
@@ -26,8 +26,8 @@ process MERGE_FASTQ {
         """
     } else {
         """
-        cat $(echo ${reads[0].join(' ')} | tr ' ' '\n' | sort -V | tr '\n' ' ') > ${prefix}_1.fastq.gz
-        cat $(echo ${reads[1].join(' ')} | tr ' ' '\n' | sort -V | tr '\n' ' ') > ${prefix}_2.fastq.gz
+        cat \$(echo ${reads[0].join(' ')} | tr ' ' '\\n' | sort -V | tr '\\n' ' ') > ${prefix}_1.fastq.gz
+        cat \$(echo ${reads[1].join(' ')} | tr ' ' '\\n' | sort -V | tr '\\n' ' ') > ${prefix}_2.fastq.gz
         cat <<-END_VERSIONS > versions.yml
         "${task.process}":
             fastp: $$(fastp --version 2>&1 | sed '1!d' | sed 's/^fastp //g')
