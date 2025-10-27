@@ -19,7 +19,7 @@ nextflow.enable.dsl = 2
 
 include { SRA                     } from './workflows/sra'
 include { FASTP                   } from './modules/local/fastp/main.nf'
-include { SNIPPY                  } from './modules/local/snippy'
+include { SNIPPY; SNIPPY as SNIPPY_MERGED } from './modules/local/snippy'
 include { MERGE_FASTQ             } from './modules/local/merge_fastq/main.nf'
 include { PIPELINE_INITIALISATION; PIPELINE_COMPLETION } from './subworkflows/local/utils_wgs_bact_pipeline'
 
@@ -98,9 +98,8 @@ workflow WGS_BACT {
     //
     // MODULE: Run Snippy on merged samples
     //
-    SNIPPY (
-        MERGE_FASTQ.out.merged_reads.map { meta, reads -> [ meta, reads, reference_genome ] },
-        "merged_snippy" // Add a suffix to the output directory for merged snippy results
+    SNIPPY_MERGED (
+        MERGE_FASTQ.out.merged_reads.map { meta, reads -> [ meta, reads, reference_genome, "merged_snippy" ] }
     )
 
 }
