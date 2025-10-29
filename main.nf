@@ -70,11 +70,13 @@ workflow WGS_BACT {
     // Group FASTQ files by sample_accession and merge them
     //
     FASTP.out.reads
-        .groupTuple(by: [0]) // Group by the first element of the tuple, which is 'meta'
-        .map { meta, reads_list ->
+        .map { meta, reads -> [ meta.sample_accession, meta, reads ] } // Add sample_accession as the first element for explicit grouping
+        .groupTuple(by: [0]) // Now groups strictly by sample_accession
+        .map { sample_accession, meta_list, reads_list ->
             def r1_files = []
             def r2_files = []
             def single_end = false
+            def merged_meta = meta_list[0] // Take the first meta object as the representative for the merged sample
 
             reads_list.each { reads ->
                 if (reads.size() == 1) {
@@ -85,12 +87,12 @@ workflow WGS_BACT {
                     r2_files << reads[1]
                 }
             }
-            // Ensure meta.single_end is correctly set for the merged sample
-            meta.single_end = single_end
+            // Ensure merged_meta.single_end is correctly set for the merged sample
+            merged_meta.single_end = single_end
             if (single_end) {
-                [ meta, r1_files ]
+                [ merged_meta, r1_files ]
             } else {
-                [ meta, r1_files, r2_files ]
+                [ merged_meta, r1_files, r2_files ]
             }
         }
         .set { grouped_reads_for_merging }
