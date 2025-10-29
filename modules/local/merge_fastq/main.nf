@@ -15,7 +15,7 @@ process MERGE_FASTQ {
     path "versions.yml"             , emit: versions
 
     script:
-    def prefix = meta.sample_accession
+    def prefix = meta.sample_accession.replaceAll(';', '_')
     if (meta.single_end) {
         """
         cat \$(echo ${r1_files.join(' ')} | tr ' ' '\\n' | sort -V | tr '\\n' ' ') > ${prefix}.fastq.gz
