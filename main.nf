@@ -71,7 +71,7 @@ workflow WGS_BACT {
     //
     FASTP.out.reads
         .map { meta, reads -> [ meta.sample_accession, meta, reads ] } // Add sample_accession as the first element for explicit grouping
-        .groupTuple(by: [0]) // Now groups strictly by sample_accession
+        .groupTuple(by: [0]) // Group by sample_accession
         .map { sample_accession, meta_list, reads_list ->
             def r1_files = []
             def r2_files = []
@@ -95,6 +95,7 @@ workflow WGS_BACT {
                 [ merged_meta, r1_files, r2_files ]
             }
         }
+        .filter { meta, r1_files, r2_files -> !meta.sample_accession.contains(';') } // Filter out multi-sample accessions
         .set { grouped_reads_for_merging }
 
     MERGE_FASTQ (
