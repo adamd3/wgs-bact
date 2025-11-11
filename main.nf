@@ -89,13 +89,17 @@ workflow WGS_BACT {
             }
             // Ensure merged_meta.single_end is correctly set for the merged sample
             merged_meta.single_end = single_end
-            if (single_end) {
-                [ merged_meta, r1_files ]
+            // Add a flag to indicate if this sample_accession has multiple runs
+            [ merged_meta, r1_files, r2_files, meta_list.size() > 1 ]
+        }
+        .filter { meta, r1_files, r2_files, is_multi_run -> is_multi_run && !meta.sample_accession.contains(';') } // Only pass multi-run samples and filter out multi-sample accessions
+        .map { meta, r1_files, r2_files, is_multi_run -> // Remove the is_multi_run flag before passing to MERGE_FASTQ
+            if (meta.single_end) {
+                [ meta, r1_files ]
             } else {
-                [ merged_meta, r1_files, r2_files ]
+                [ meta, r1_files, r2_files ]
             }
         }
-        .filter { meta, r1_files, r2_files -> !meta.sample_accession.contains(';') } // Filter out multi-sample accessions
         .set { grouped_reads_for_merging }
 
     MERGE_FASTQ (
