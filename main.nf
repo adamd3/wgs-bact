@@ -89,6 +89,7 @@ workflow WGS_BACT {
             }
             // Ensure merged_meta.single_end is correctly set for the merged sample
             merged_meta.single_end = single_end
+            merged_meta.id = merged_meta.sample_accession // Set the ID for the merged sample
             // Add a flag to indicate if this sample_accession has multiple runs
             [ merged_meta, r1_files, r2_files, meta_list.size() > 1 ]
         }
