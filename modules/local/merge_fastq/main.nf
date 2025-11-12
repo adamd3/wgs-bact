@@ -16,9 +16,12 @@ process MERGE_FASTQ {
 
     script:
     def prefix = meta.sample_accession.replaceAll(';', '_')
+    def r1_filtered = r1_files.findAll { it.exists() && it.isFile() }
+    def r2_filtered = r2_files.findAll { it.exists() && it.isFile() }
+
     if (meta.single_end) {
         """
-        cat \$(echo ${r1_files.join(' ')} | tr ' ' '\\n' | sort -V | tr '\\n' ' ') > ${prefix}.fastq.gz
+        cat \$(echo ${r1_filtered.join(' ')} | tr ' ' '\\n' | sort -V | tr '\\n' ' ') > ${prefix}.fastq.gz
         cat <<-END_VERSIONS > versions.yml
         "${task.process}":
             fastp: \$(fastp --version 2>&1 | sed '1!d' | sed 's/^fastp //g')
@@ -26,8 +29,8 @@ process MERGE_FASTQ {
         """
     } else {
         """
-        cat \$(echo ${r1_files.join(' ')} | tr ' ' '\\n' | sort -V | tr '\\n' ' ') > ${prefix}_1.fastq.gz
-        cat \$(echo ${r2_files.join(' ')} | tr ' ' '\\n' | sort -V | tr '\\n' ' ') > ${prefix}_2.fastq.gz
+        cat \$(echo ${r1_filtered.join(' ')} | tr ' ' '\\n' | sort -V | tr '\\n' ' ') > ${prefix}_1.fastq.gz
+        cat \$(echo ${r2_filtered.join(' ')} | tr ' ' '\\n' | sort -V | tr '\\n' ' ') > ${prefix}_2.fastq.gz
         cat <<-END_VERSIONS > versions.yml
         "${task.process}":
             fastp: \$(fastp --version 2>&1 | sed '1!d' | sed 's/^fastp //g')
