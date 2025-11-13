@@ -67,7 +67,7 @@ workflow WGS_BACT {
     // MODULE: Run Snippy to call variants
     //
     SNIPPY (
-        FASTP.out.reads.map { meta, reads -> [ meta, reads, reference_genome, null ] }
+        FASTP.out.reads.map { original_meta, reads -> [ original_meta, reads, reference_genome, null, original_meta.run_accession ] }
     )
 
     //
@@ -115,7 +115,7 @@ workflow WGS_BACT {
     // MODULE: Run Snippy on merged samples
     //
     SNIPPY_MERGED (
-        MERGE_FASTQ.out.merged_reads.map { meta, reads -> [ meta, reads, reference_genome, "merged_snippy" ] }
+        MERGE_FASTQ.out.merged_reads.map { meta, reads -> [ meta, reads, reference_genome, "merged_snippy", meta.id ] }
     )
 
     // Emit a signal when the workflow is done
