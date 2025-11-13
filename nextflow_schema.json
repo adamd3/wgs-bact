@@ -124,6 +124,11 @@
                     "type": "string",
                     "description": "Extra arguments to pass to Snippy.",
                     "default": ""
+                },
+                "save_intermediate_fastqs": {
+                    "type": "boolean",
+                    "description": "Set to false to delete intermediate downloaded and trimmed FASTQ files.",
+                    "default": true
                 }
             }
         },
