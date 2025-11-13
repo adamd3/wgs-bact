@@ -2,8 +2,6 @@ process SNIPPY {
     tag "${meta.id}"
     label 'process_high' // Snippy can be resource intensive
 
-    println "DEBUG: SNIPPY process - meta.id before output block: ${meta.id}"
-
     conda (params.enable_conda ? "bioconda::snippy=4.6.0" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/snippy:4.6.0--hdfd78af_1' :
@@ -21,6 +19,8 @@ process SNIPPY {
     def prefix = task.ext.prefix ?: "${meta.id}${suffix ? '_' + suffix : ''}"
 
     """
+    echo "DEBUG: SNIPPY process - meta.id inside script block: ${meta.id}"
+    echo "DEBUG: SNIPPY process - prefix inside script block: ${prefix}"
     echo "--- SNIPPY Debug Info ---"
     echo "Input reads: ${reads_list}"
     echo "Reference: ${reference}"
