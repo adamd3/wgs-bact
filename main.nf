@@ -115,6 +115,18 @@ workflow WGS_BACT {
         MERGE_FASTQ.out.merged_reads.map { meta, reads -> [ meta, reads, reference_genome, "merged_snippy" ] }
     )
 
+    // Emit a signal when the workflow is done
+    // This channel will only emit once all upstream processes have completed
+    Channel
+        .empty()
+        .mix(SNIPPY.out.snippy_results.last()) // Ensure SNIPPY is done
+        .mix(SNIPPY_MERGED.out.snippy_results.last()) // Ensure SNIPPY_MERGED is done
+        .collect() // Collects all items into a list, then emits the list once
+        .map { true } // Emit a single 'true' value
+        .set { done_signal }
+
+    emit:
+    done = done_signal
 }
 
 /*
@@ -151,6 +163,7 @@ workflow {
     // SUBWORKFLOW: Run completion tasks
     //
     CLEANUP_FASTQ_DIRS (
+        WGS_BACT.out.done,
         params.outdir,
         params.save_intermediate_fastqs
     )

@@ -3,6 +3,7 @@ process CLEANUP_FASTQ_DIRS {
     label 'process_low'
 
     input:
+    val(done_signal) // Dummy input to ensure it runs after WGS_BACT
     val(outdir)
     val(save_intermediate_fastqs)
 
