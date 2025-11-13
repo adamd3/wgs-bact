@@ -21,6 +21,7 @@ include { SRA                     } from './workflows/sra'
 include { FASTP                   } from './modules/local/fastp/main.nf'
 include { SNIPPY; SNIPPY as SNIPPY_MERGED } from './modules/local/snippy'
 include { MERGE_FASTQ             } from './modules/local/merge_fastq/main.nf'
+include { CLEANUP_FASTQ_DIRS      } from './modules/local/cleanup_fastq_dirs/main.nf'
 include { PIPELINE_INITIALISATION; PIPELINE_COMPLETION } from './subworkflows/local/utils_wgs_bact_pipeline'
 
 /*
@@ -149,6 +150,11 @@ workflow {
     //
     // SUBWORKFLOW: Run completion tasks
     //
+    CLEANUP_FASTQ_DIRS (
+        params.outdir,
+        params.save_intermediate_fastqs
+    )
+
     PIPELINE_COMPLETION (
         params.email,
         params.email_on_fail,
