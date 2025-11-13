@@ -50,14 +50,17 @@ workflow WGS_BACT {
     //
     // MODULE: Run fastp to trim reads
     //
-    FASTP ( SRA.out.sra_metadata.map { meta ->
+    FASTP ( SRA.out.sra_metadata.map { original_meta ->
         def reads = []
-        if (meta.single_end) {
-            reads = [ file(meta.fastq_1) ]
+        if (original_meta.single_end) {
+            reads = [ file(original_meta.fastq_1) ]
         } else {
-            reads = [ file(meta.fastq_1), file(meta.fastq_2) ]
+            reads = [ file(original_meta.fastq_1), file(original_meta.fastq_2) ]
         }
-        [ meta, reads ]
+        // Create a new meta object to ensure 'id' is explicitly set
+        def new_meta = original_meta.clone()
+        new_meta.id = original_meta.run_accession // Use run_accession as the primary ID for individual runs
+        [ new_meta, reads ]
     } )
 
     //
