@@ -199,7 +199,7 @@ class DatabaseResolver:
         "PRJDB",
         "SAMD",
     }
-    _ENA_PREFIXES = {"ERR", "SRR", "SAMN", "DRR"}
+    _ENA_PREFIXES = {"ERR", "SRR", "SAMN", "DRR", "SAMEA"}
 
     @classmethod
     def expand_identifier(cls, identifier):
