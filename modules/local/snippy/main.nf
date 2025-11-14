@@ -16,6 +16,7 @@ process SNIPPY {
 
     script:
     def args = task.ext.args ?: params.snippy_args
+    def cleanup_arg = params.snippy_cleanup ? '--cleanup' : ''
     def prefix = task.ext.prefix ?: "${process_id}${suffix ? '_' + suffix : ''}"
 
     """
@@ -40,6 +41,7 @@ process SNIPPY {
             --minfrac ${params.snippy_min_frac} \\
             --minqual ${params.snippy_min_qual} \\
             --maxsoft ${params.snippy_max_soft} \\
+            ${cleanup_arg} \\
             ${args} 2>&1 | tee snippy_output.log
         if [ \$? -ne 0 ]; then
             echo "Error: Snippy command failed. See snippy_output.log for details."
@@ -61,6 +63,7 @@ process SNIPPY {
             --minfrac ${params.snippy_min_frac} \\
             --minqual ${params.snippy_min_qual} \\
             --maxsoft ${params.snippy_max_soft} \\
+            ${cleanup_arg} \\
             ${args} 2>&1 | tee snippy_output.log
         if [ \$? -ne 0 ]; then
             echo "Error: Snippy command failed. See snippy_output.log for details."
