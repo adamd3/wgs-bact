@@ -16,7 +16,9 @@ process SNIPPY {
 
     script:
     def args = task.ext.args ?: params.snippy_args
-    def cleanup_arg = params.snippy_cleanup ? '--cleanup' : ''
+    // Removed cleanup_arg, as it seems to be causing issues with publishDir and missing files.
+    // The user can control overall cleanup behavior via Nextflow's own mechanisms if desired.
+    def cleanup_arg = '' 
     def prefix = task.ext.prefix ?: "${process_id}${suffix ? '_' + suffix : ''}"
 
     """
@@ -71,10 +73,6 @@ process SNIPPY {
             exit 1
         fi
     fi
-
-    echo "--- SNIPPY Output Directory Structure ---"
-    ls -R ${prefix}_snippy
-    echo "---------------------------------------"
 
     cat <<-END_VERSIONS > versions.yml
     "SNIPPY":
