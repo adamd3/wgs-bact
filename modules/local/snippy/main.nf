@@ -72,6 +72,10 @@ process SNIPPY {
         fi
     fi
 
+    echo "--- SNIPPY Output Directory Structure ---"
+    ls -R ${prefix}_snippy
+    echo "---------------------------------------"
+
     cat <<-END_VERSIONS > versions.yml
     "SNIPPY":
         snippy: \$(snippy --version | sed 's/^.*version //')
