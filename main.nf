@@ -115,7 +115,7 @@ workflow WGS_BACT {
     // MODULE: Run Snippy on merged samples
     //
     SNIPPY_MERGED (
-        MERGE_FASTQ.out.merged_reads.map { meta, reads -> [ meta, reads, reference_genome, "merged_snippy", meta.id ] }
+        MERGE_FASTQ.out.merged_reads.map { meta, reads -> [ meta, reads, reference_genome, "merged", meta.id ] }
     )
 
     // Emit a signal when the workflow is done
