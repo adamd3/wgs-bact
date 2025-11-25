@@ -125,11 +125,7 @@
                     "description": "Extra arguments to pass to Snippy.",
                     "default": ""
                 },
-                "snippy_cleanup": {
-                    "type": "boolean",
-                    "description": "Set to true to enable the --cleanup option for Snippy.",
-                    "default": false
-                },
+
                 "save_intermediate_fastqs": {
                     "type": "boolean",
                     "description": "Set to false to delete intermediate downloaded and trimmed FASTQ files.",
