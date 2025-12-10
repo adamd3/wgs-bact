@@ -125,7 +125,12 @@
                     "description": "Extra arguments to pass to Snippy.",
                     "default": ""
                 },
-
+                "instrument_platform_filter": {
+                    "type": "string",
+                    "description": "Filter samples by instrument platform before processing. 'ILLUMINA' (default) to process only Illumina data, or 'ALL' to process all platforms.",
+                    "default": "ILLUMINA",
+                    "enum": ["ILLUMINA", "ALL"]
+                },
                 "save_intermediate_fastqs": {
                     "type": "boolean",
                     "description": "Set to false to delete intermediate downloaded and trimmed FASTQ files.",
