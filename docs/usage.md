@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The pipeline has been set-up to automatically download and process the raw FastQ files from public repositories. Identifiers can be provided in a file, one-per-line via the `--input` parameter. Currently, the following types of example identifiers are supported:
+The pipeline has been set-up to automatically download and process the raw FastQ files from public repositories. Currently, the following types of example identifiers are supported:
 
 | `SRA`        | `ENA`        | `DDBJ`       | `GEO`      |
 | ------------ | ------------ | ------------ | ---------- |
@@ -13,6 +13,39 @@ The pipeline has been set-up to automatically download and process the raw FastQ
 | SRP256957    | ERP120836    | DRP004793    |            |
 | SRA1068758   | ERA2420837   | DRA008156    |            |
 | PRJNA625551  | PRJEB37513   | PRJDB4176    |            |
+
+### Pipeline Parameters
+
+#### `--input`
+
+File containing database identifiers, one per line, to download their associated metadata and FastQ files.
+
+Example `ids.csv`:
+
+```csv
+SRR9984183
+SRR13191702
+ERR1160846
+ERR1109373
+DRR028935
+DRR026872
+```
+
+#### `--reference_genome`
+
+Path to the reference genome file in FASTA format.
+
+#### `--outdir`
+
+The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.
+
+#### `--instrument_platform_filter`
+
+Use this parameter to filter input samples based on their sequencing instrument platform.
+By default, the pipeline will only process samples from the 'ILLUMINA' platform (`--instrument_platform_filter ILLUMINA`).
+To process samples from all available instrument platforms, set this parameter to `'ALL'` (`--instrument_platform_filter ALL`).
+
+Default: `ILLUMINA`
 
 ### SRR / ERR / DRR ids
 

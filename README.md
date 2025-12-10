@@ -7,21 +7,6 @@
 > [!NOTE]
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
-First, prepare a samplesheet with your input data that looks as follows:
-
-`ids.csv`:
-
-```csv
-SRR9984183
-SRR13191702
-ERR1160846
-ERR1109373
-DRR028935
-DRR026872
-```
-
-Each line represents a database id. Please see next section for supported ids.
-
 Now, you can run the pipeline using:
 
 ```bash
@@ -38,6 +23,29 @@ nextflow run adamd3/wgs-bact \
 
 ### Pipeline Parameters
 
+#### `--input`
+
+File containing database identifiers, one per line, to download their associated metadata and FastQ files.
+
+Example `ids.csv`:
+
+```csv
+SRR9984183
+SRR13191702
+ERR1160846
+ERR1109373
+DRR028935
+DRR026872
+```
+
+#### `--reference_genome`
+
+Path to the reference genome file in FASTA format.
+
+#### `--outdir`
+
+The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.
+
 #### `--instrument_platform_filter`
 
 Use this parameter to filter input samples based on their sequencing instrument platform.
@@ -48,9 +56,11 @@ Default: `ILLUMINA`
 
 ### Supported ids
 
-Via a single file of ids, provided one-per-line (see [example input file](https://raw.githubusercontent.com/nf-core/test-datasets/fetchngs/sra_ids_test.csv)) the pipeline performs the following steps:
+SRA / ENA / DDBJ / GEO ids
 
-### SRA / ENA / DDBJ / GEO ids
+### What the pipeline does
+
+Via a single file of ids, provided one-per-line (see [example input file](https://raw.githubusercontent.com/nf-core/test-datasets/fetchngs/sra_ids_test.csv)) the pipeline performs the following steps:
 
 1. Resolve database ids back to appropriate experiment-level ids and to be compatible with the [ENA API](https://ena-docs.readthedocs.io/en/latest/retrieval/programmatic-access.html)
 2. Fetch extensive id metadata via ENA API
