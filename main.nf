@@ -47,21 +47,10 @@ workflow WGS_BACT {
     //
     SRA ( ids )
 
-    // Filter SRA metadata by instrument platform as early as possible
-    SRA.out.sra_metadata
-        .filter { original_meta ->
-            if (params.instrument_platform_filter == 'ALL') {
-                return true
-            } else {
-                return original_meta.instrument_platform == params.instrument_platform_filter
-            }
-        }
-        .set { filtered_sra_metadata } // New channel for filtered metadata
-
     //
-    // MODULE: Run fastp to trim reads - now receives filtered metadata
+    // MODULE: Run fastp to trim reads - now receives already filtered metadata directly from SRA.out.sra_metadata
     //
-    FASTP ( filtered_sra_metadata.map { original_meta ->
+    FASTP ( SRA.out.sra_metadata.map { original_meta ->
         def reads = []
         if (original_meta.single_end) {
             reads = [ file(original_meta.fastq_1) ]

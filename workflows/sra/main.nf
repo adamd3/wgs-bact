@@ -62,7 +62,14 @@ workflow SRA {
                 return meta_clone
         }
         .unique()
-        .set { ch_sra_metadata }
+        .filter { original_meta -> // Apply instrument_platform filter here
+            if (params.instrument_platform_filter == 'ALL') {
+                return true
+            } else {
+                return original_meta.instrument_platform == params.instrument_platform_filter
+            }
+        }
+        .set { ch_sra_metadata } // Now ch_sra_metadata is filtered
 
     if (!params.skip_fastq_download) {
 
