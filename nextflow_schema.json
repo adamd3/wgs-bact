@@ -86,7 +86,7 @@
                 "reference_genome": {
                     "type": ["string", "null"],
                     "format": "file-path",
-                    "description": "Path to the reference genome file."
+                    "description": "Path to the reference genome file in FASTA or GENBANK format."
                 },
                 "fastp_args": {
                     "type": ["string", "null"],

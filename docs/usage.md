@@ -23,6 +23,7 @@ File containing database identifiers, one per line, to download their associated
 Example `ids.csv`:
 
 ```csv
+SAMN00000001
 SRR9984183
 SRR13191702
 ERR1160846
@@ -33,7 +34,7 @@ DRR026872
 
 #### `--reference_genome`
 
-Path to the reference genome file in FASTA format.
+Path to the reference genome file in FASTA or GENBANK format.
 
 #### `--outdir`
 
