@@ -30,6 +30,16 @@ If you have a GEO accession (found in the data availability section of published
 
 This downloads a text file called `SRR_Acc_List.txt` that can be directly provided to the pipeline once renamed with a .csv extension e.g. `--input SRR_Acc_List.csv`.
 
+## Pipeline Parameters
+
+#### `--instrument_platform_filter`
+
+Use this parameter to filter input samples based on their sequencing instrument platform.
+By default, the pipeline will only process samples from the 'ILLUMINA' platform (`--instrument_platform_filter ILLUMINA`).
+To process samples from all available instrument platforms, set this parameter to `'ALL'` (`--instrument_platform_filter ALL`).
+
+Default: `ILLUMINA`
+
 ### Samplesheet format
 
 As a bonus, the columns in the auto-created samplesheet can be tailored to be accepted out-of-the-box by selected nf-core pipelines, these currently include:

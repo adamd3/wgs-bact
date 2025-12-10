@@ -36,7 +36,17 @@ nextflow run adamd3/wgs-bact \
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
 > see [docs](https://nf-co.re/usage/configuration#custom-configuration-files).
 
-## Supported ids
+### Pipeline Parameters
+
+#### `--instrument_platform_filter`
+
+Use this parameter to filter input samples based on their sequencing instrument platform.
+By default, the pipeline will only process samples from the 'ILLUMINA' platform (`--instrument_platform_filter ILLUMINA`).
+To process samples from all available instrument platforms, set this parameter to `'ALL'` (`--instrument_platform_filter ALL`).
+
+Default: `ILLUMINA`
+
+### Supported ids
 
 Via a single file of ids, provided one-per-line (see [example input file](https://raw.githubusercontent.com/nf-core/test-datasets/fetchngs/sra_ids_test.csv)) the pipeline performs the following steps:
 
