@@ -74,13 +74,15 @@ workflow WGS_BACT {
     // Group FASTQ files by sample_accession and merge them
     //
     FASTP.out.reads
-        .map { meta, reads -> [ meta.sample_accession, meta, reads ] } // Add sample_accession as the first element for explicit grouping
-        .groupTuple(by: [0]) // Group by sample_accession
-        .map { sample_accession, meta_list, reads_list ->
+        .map { meta, reads -> [ [meta.sample_accession, meta.instrument_platform], meta, reads ] } // Create composite key for grouping
+        .groupTuple(by: [0]) // Group by the composite key
+        .map { group_key, meta_list, reads_list ->
+            def sample_accession = group_key[0]
+            def instrument_platform = group_key[1]
             def r1_files = []
             def r2_files = []
             def single_end = false
-            def merged_meta = meta_list[0] // Take the first meta object as the representative for the merged sample
+            def merged_meta = meta_list[0].clone() // Clone to avoid modifying original meta objects
 
             reads_list.each { reads ->
                 if (reads.size() == 1) {
@@ -93,14 +95,14 @@ workflow WGS_BACT {
             }
             // Ensure merged_meta.single_end is correctly set for the merged sample
             merged_meta.single_end = single_end
-            merged_meta.id = merged_meta.sample_accession // Set the ID for the merged sample
+            merged_meta.id = "${sample_accession}_${instrument_platform}" // Set the ID for the merged sample using the composite key
             // Add a flag to indicate if this sample_accession has multiple runs
             [ merged_meta, r1_files, r2_files, meta_list.size() > 1 ]
         }
-        .filter { meta, r1_files, r2_files, is_multi_run -> is_multi_run && !meta.sample_accession.contains(';') } // Only pass multi-run samples and filter out multi-sample accessions
-        .map { meta, r1_files, r2_files, is_multi_run -> // Remove the is_multi_run flag before passing to MERGE_FASTQ
+        .filter { meta, r1_files, r2_files, is_multi_run -> is_multi_run && !meta.sample_accession.contains(';') }
+        .map { meta, r1_files, r2_files, is_multi_run ->
             if (meta.single_end) {
-                [ meta, r1_files ]
+                [ meta, r1_files, [] ] // Always emit a 3-element tuple for consistency
             } else {
                 [ meta, r1_files, r2_files ]
             }
