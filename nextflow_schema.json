@@ -86,7 +86,7 @@
                 "reference_genome": {
                     "type": ["string", "null"],
                     "format": "file-path",
-                    "description": "Path to the reference genome file in FASTA or GENBANK format."
+                    "description": "Path to the reference genome file in FASTA or GENBANK format. If GENBANK is provided, snippy variant calls will include variant effect annotations from SnpEff."
                 },
                 "fastp_args": {
                     "type": ["string", "null"],
