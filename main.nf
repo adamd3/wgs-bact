@@ -109,6 +109,16 @@ workflow WGS_BACT {
         }
         .set { grouped_reads_for_merging }
 
+    // DEBUG: View the contents of the channel before passing to MERGE_FASTQ
+    grouped_reads_for_merging.view {
+        """
+        [DEBUG MERGE_FASTQ Input]
+        meta: ${it[0]}
+        r1_files: ${it[1]}
+        r2_files: ${it[2]}
+        """
+    }
+
     MERGE_FASTQ (
         grouped_reads_for_merging
     )
