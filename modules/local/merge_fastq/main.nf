@@ -3,9 +3,7 @@ process MERGE_FASTQ {
     label "process_medium"
 
     conda (params.enable_conda ? "bioconda::fastp=0.23.2" : null)
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ? \
-        'https://depot.galaxyproject.org/singularity/fastp:0.23.2--h78949ad_0' : \
-        'quay.io/biocontainers/fastp:0.23.2--h78949ad_0' }"
+    container 'quay.io/biocontainers/fastp:0.23.2'
 
     input:
     tuple val(meta), path(r1_files), path(r2_files)
