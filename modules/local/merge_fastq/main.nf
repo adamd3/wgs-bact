@@ -12,6 +12,8 @@ process MERGE_FASTQ {
     tuple val(meta), path("*.fastq.gz"), emit: merged_reads
     path "versions.yml"             , emit: versions
 
+    publishDir "${params.outdir}/fastq_merged", pattern: "*.fastq.gz", mode: "copy", enabled: params.save_intermediate_fastqs
+
     script:
     def prefix = meta.sample_accession.replaceAll(';', '_')
     def r1_filtered = r1_files.findAll { it.exists() && it.isFile() }

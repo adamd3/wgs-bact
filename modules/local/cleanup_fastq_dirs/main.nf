@@ -11,8 +11,10 @@ process CLEANUP_FASTQ_DIRS {
     if (!save_intermediate_fastqs) {
         """
         echo "Cleaning up intermediate FASTQ directories..."
-        rm -rf ${outdir}/fastq
-        rm -rf ${outdir}/fastp
+        rm -rf "${outdir}/fastq_raw"
+        rm -rf "${outdir}/fastq_trimmed"
+        rm -rf "${outdir}/fastq_merged"
+        rm -rf "${outdir}/fastp_reports"
         echo "Cleanup complete."
         """
     } else {

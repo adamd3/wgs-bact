@@ -14,6 +14,9 @@ process FASTP {
     path "*.html", emit: html
     path "versions.yml", emit: versions
 
+    publishDir "${params.outdir}/fastq_trimmed", pattern: "*.trimmed.fastq.gz", mode: "copy", enabled: params.save_intermediate_fastqs
+    publishDir "${params.outdir}/fastp_reports", pattern: "*.{json,html}", mode: "copy", enabled: params.save_intermediate_fastqs
+
     when:
     task.ext.when == null || task.ext.when
 
