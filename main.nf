@@ -73,66 +73,69 @@ workflow WGS_BACT {
     //
     // Group FASTQ files by sample_accession and merge them
     //
-    FASTP.out.reads
-        .filter { meta, reads -> // Apply instrument_platform filter
-            if (params.instrument_platform_filter == 'ALL') {
-                return true
-            } else {
-                return meta.instrument_platform == params.instrument_platform_filter
-            }
-        }
-        .map { meta, reads -> [ meta.sample_accession, meta, reads ] } // Revert to grouping only by sample_accession
-        .groupTuple(by: [0]) // Group by sample_accession
-        .map { sample_accession, meta_list, reads_list ->
-            def r1_files = []
-            def r2_files = []
-            def single_end = false
-            def merged_meta = meta_list[0].clone() // Take the first meta object as the representative for the merged sample
-
-            reads_list.each { reads ->
-                if (reads.size() == 1) {
-                    r1_files << reads[0]
-                    single_end = true
+    def snippy_merged_completion = Channel.value(true)
+    if (params.merge) {
+        FASTP.out.reads
+            .filter { meta, reads -> // Apply instrument_platform filter
+                if (params.instrument_platform_filter == 'ALL') {
+                    return true
                 } else {
-                    r1_files << reads[0]
-                    r2_files << reads[1]
+                    return meta.instrument_platform == params.instrument_platform_filter
                 }
             }
-            // Ensure merged_meta.single_end is correctly set for the merged sample
-            merged_meta.single_end = single_end
-            merged_meta.id = merged_meta.sample_accession // Revert ID to original state
-            // Add a flag to indicate if this sample_accession has multiple runs
-            [ merged_meta, r1_files, r2_files, meta_list.size() > 1 ]
-        }
-        .filter { meta, r1_files, r2_files, is_multi_run -> is_multi_run && !meta.sample_accession.contains(';') } // Only pass multi-run samples and filter out multi-sample accessions
-        .map { meta, r1_files, r2_files, is_multi_run -> // Ensure 3-element tuple for consistency
-            if (meta.single_end) {
-                [ meta, r1_files, [] ]
-            } else {
-                [ meta, r1_files, r2_files ]
+            .map { meta, reads -> [ meta.sample_accession, meta, reads ] } // Revert to grouping only by sample_accession
+            .groupTuple(by: [0]) // Group by sample_accession
+            .map { sample_accession, meta_list, reads_list ->
+                def r1_files = []
+                def r2_files = []
+                def single_end = false
+                def merged_meta = meta_list[0].clone() // Take the first meta object as the representative for the merged sample
+
+                reads_list.each { reads ->
+                    if (reads.size() == 1) {
+                        r1_files << reads[0]
+                        single_end = true
+                    } else {
+                        r1_files << reads[0]
+                        r2_files << reads[1]
+                    }
+                }
+                // Ensure merged_meta.single_end is correctly set for the merged sample
+                merged_meta.single_end = single_end
+                merged_meta.id = merged_meta.sample_accession // Revert ID to original state
+                // Add a flag to indicate if this sample_accession has multiple runs
+                [ merged_meta, r1_files, r2_files, meta_list.size() > 1 ]
             }
-        }
-        .set { grouped_reads_for_merging }
+            .filter { meta, r1_files, r2_files, is_multi_run -> is_multi_run && !meta.sample_accession.contains(';') } // Only pass multi-run samples and filter out multi-sample accessions
+            .map { meta, r1_files, r2_files, is_multi_run -> // Ensure 3-element tuple for consistency
+                if (meta.single_end) {
+                    [ meta, r1_files, [] ]
+                } else {
+                    [ meta, r1_files, r2_files ]
+                }
+            }
+            .set { grouped_reads_for_merging }
 
-    MERGE_FASTQ (
-        grouped_reads_for_merging
-    )
+        MERGE_FASTQ (
+            grouped_reads_for_merging
+        )
 
-    //
-    // MODULE: Run Snippy on merged samples
-    //
-    SNIPPY_MERGED (
-        MERGE_FASTQ.out.merged_reads.map { meta, reads -> [ meta, reads, reference_genome, "merged", meta.id ] }
-    )
+        //
+        // MODULE: Run Snippy on merged samples
+        //
+        SNIPPY_MERGED (
+            MERGE_FASTQ.out.merged_reads.map { meta, reads -> [ meta, reads, reference_genome, "merged", meta.id ] }
+        )
+        snippy_merged_completion = SNIPPY_MERGED.out.snippy_results.last()
+    }
+
 
     // Emit a signal when the workflow is done
     // This channel will only emit once all upstream processes have completed
-    Channel
-        .empty()
-        .mix(SNIPPY.out.snippy_results.last()) // Ensure SNIPPY is done
-        .mix(SNIPPY_MERGED.out.snippy_results.last()) // Ensure SNIPPY_MERGED is done
-        .collect() // Collects all items into a list, then emits the list once
-        .map { true } // Emit a single 'true' value
+    SNIPPY.out.snippy_results.last()
+        .mix(snippy_merged_completion)
+        .collect()
+        .map { true }
         .set { done_signal }
 
     emit:

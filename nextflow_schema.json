@@ -135,6 +135,11 @@
                     "type": "boolean",
                     "description": "Set to false to delete intermediate downloaded and trimmed FASTQ files.",
                     "default": true
+                },
+                "merge": {
+                    "type": "boolean",
+                    "description": "Merge FASTQ files from the same biosample accession if multiple runs are found.",
+                    "default": true
                 }
             }
         },
