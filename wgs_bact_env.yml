@@ -1,0 +1,8 @@
+name: wgs_bact_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - fastp=0.23.2
+  - snippy=4.6.0
