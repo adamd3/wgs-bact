@@ -4,6 +4,7 @@ nextflow.enable.dsl = 2
 process BWA_INDEX {
     tag "bwa_index_${reference.baseName}"
     label 'process_high'
+    conda (params.enable_conda ? "${baseDir}/modules/local/bwa/environment.yml" : null)
 
     input:
     path reference
@@ -23,6 +24,7 @@ process BWA_INDEX {
 process BWA_MEM {
     tag "$meta.id"
     label 'process_high'
+    conda (params.enable_conda ? "${baseDir}/modules/local/bwa/environment.yml" : null)
 
     input:
     tuple val(meta), path(reads), path(reference)
