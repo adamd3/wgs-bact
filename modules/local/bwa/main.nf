@@ -27,7 +27,7 @@ process BWA_MEM {
     conda (params.enable_conda ? "${baseDir}/modules/local/bwa/environment.yml" : null)
 
     input:
-    tuple val(meta), path(reads), path(indexed_ref_dir) // Changed input
+    tuple val(meta), path(reads), path(indexed_ref_dir), path(indexed_fasta_path)
 
     output:
     tuple val(meta), path("${name}.bam"), path("${name}.bam.bai"), emit: bam
@@ -36,27 +36,28 @@ process BWA_MEM {
 
     script:
     def original_ref_basename = indexed_ref_dir.baseName.replace(".bwa_idx", "") // e.g., GCF_000016305.1_ASM1630v1_genomic
-    def ref_fasta_in_dir = indexed_ref_dir.list().find{ it.name.endsWith(".fna") || it.name.endsWith(".fasta") || it.name.endsWith(".fa") } // Find the actual fasta file in the directory
     def name = "${meta.id}.${original_ref_basename}"
 
     if (meta.single_end) {
         """
-        # Create a symlink to the indexed reference directory
+        # Create a symlink to the indexed reference directory staged by Nextflow
+        # This allows bwa mem to find the index files relative to the FASTA
         ln -s ${indexed_ref_dir} ./${original_ref_basename}.bwa_idx_link
-
+        
         # Now run bwa mem using the reference file inside the symlinked directory
-        bwa mem -t ${task.cpus} ./${original_ref_basename}.bwa_idx_link/${ref_fasta_in_dir.name} \\
+        bwa mem -t ${task.cpus} ./${original_ref_basename}.bwa_idx_link/${indexed_fasta_path.name} \\
             ${reads[0]} | \\
             samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
         """
     } else {
         """
-        # Create a symlink to the indexed reference directory
+        # Create a symlink to the indexed reference directory staged by Nextflow
+        # This allows bwa mem to find the index files relative to the FASTA
         ln -s ${indexed_ref_dir} ./${original_ref_basename}.bwa_idx_link
-
+        
         # Now run bwa mem using the reference file inside the symlinked directory
-        bwa mem -t ${task.cpus} ./${original_ref_basename}.bwa_idx_link/${ref_fasta_in_dir.name} \\
+        bwa mem -t ${task.cpus} ./${original_ref_basename}.bwa_idx_link/${indexed_fasta_path.name} \\
             ${reads[0]} ${reads[1]} | \\
             samtools sort -@ ${task.cpus - 1} -O bam - > ${name}.bam
         samtools index -@ ${task.cpus} ${name}.bam
