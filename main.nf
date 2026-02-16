@@ -49,6 +49,11 @@ workflow WGS_BACT {
 
     def indexed_reference_ch = Channel.empty()
     if (params.align_reads) {
+        // Validate reference genome is FASTA format for BWA
+        def ref_file = file(params.reference_genome)
+        if (!ref_file.extension || !(ref_file.extension == 'fasta' || ref_file.extension == 'fa' || ref_file.extension == 'fna')) {
+            error "Error: BWA alignment requires a FASTA format reference genome. Provided file '${params.reference_genome}' does not have a recognized FASTA extension (.fasta, .fa, .fna)."
+        }
         BWA_INDEX ( reference_genome_ch.map { it } )
         indexed_reference_ch = BWA_INDEX.out.index.combine(BWA_INDEX.out.indexed_reference)
     }
