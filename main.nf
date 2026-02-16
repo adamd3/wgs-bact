@@ -100,7 +100,7 @@ workflow WGS_BACT {
         BWA_MEM (
             FASTP.out.reads
                 .combine(indexed_reference_ch.first()) // .first() to get the indexed reference once
-                .map { original_meta, reads, indexed_ref_dir, indexed_ref_fasta -> [ original_meta, reads, indexed_ref_fasta ] } // Pass indexed_ref_fasta to BWA_MEM
+                .map { original_meta, reads, indexed_ref_dir, indexed_ref_fasta -> [ original_meta, reads, indexed_ref_dir ] } // Pass indexed_ref_dir to BWA_MEM
         )
         bwa_results_ch = BWA_MEM.out.bam // Change from .sam to .bam
     }
