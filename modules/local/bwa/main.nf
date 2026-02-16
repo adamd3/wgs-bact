@@ -30,15 +30,8 @@ process BWA_MEM {
     tuple val(meta), path(reads), path(indexed_ref_dir), path(indexed_fasta_path)
 
     output:
-    tuple val(meta), path { meta, reads, indexed_ref_dir, indexed_fasta_path ->
-        def original_ref_basename_closure = indexed_ref_dir.baseName.replace(".bwa_idx", "")
-        def output_name_closure = "${meta.id}.${original_ref_basename_closure}"
-        return "${output_name_closure}.bam"
-    }, path { meta, reads, indexed_ref_dir, indexed_fasta_path ->
-        def original_ref_basename_closure = indexed_ref_dir.baseName.replace(".bwa_idx", "")
-        def output_name_closure = "${meta.id}.${original_ref_basename_closure}"
-        return "${output_name_closure}.bam.bai"
-    }, emit: bam
+    // Follow FASTP's pattern: use globbing based on the 'name' defined in the script
+    tuple val(meta), path("*.bam"), path("*.bam.bai"), emit: bam
 
     publishDir "${params.outdir}/bwa_alignments", pattern: "*.{bam,bam.bai}", mode: "copy"
 
