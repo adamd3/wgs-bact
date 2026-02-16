@@ -30,19 +30,15 @@ process BWA_MEM {
     tuple val(meta), path(reads), path(indexed_ref_dir), path(indexed_fasta_path)
 
     output:
-    tuple val(meta), path(
-        { some_meta, some_indexed_ref_dir -> // Explicitly define arguments
-            def original_ref_basename_closure = some_indexed_ref_dir.baseName.replace(".bwa_idx", "")
-            def output_name_closure = "${some_meta.id}.${original_ref_basename_closure}"
-            return "${output_name_closure}.bam"
-        }.call(meta, indexed_ref_dir) // Explicitly pass arguments
-    ), path(
-        { some_meta, some_indexed_ref_dir -> // Explicitly define arguments
-            def original_ref_basename_closure = some_indexed_ref_dir.baseName.replace(".bwa_idx", "")
-            def output_name_closure = "${some_meta.id}.${original_ref_basename_closure}"
-            return "${output_name_closure}.bam.bai"
-        }.call(meta, indexed_ref_dir) // Explicitly pass arguments
-    ), emit: bam
+    tuple val(meta), path { meta, reads, indexed_ref_dir, indexed_fasta_path ->
+        def original_ref_basename_closure = indexed_ref_dir.baseName.replace(".bwa_idx", "")
+        def output_name_closure = "${meta.id}.${original_ref_basename_closure}"
+        return "${output_name_closure}.bam"
+    }, path { meta, reads, indexed_ref_dir, indexed_fasta_path ->
+        def original_ref_basename_closure = indexed_ref_dir.baseName.replace(".bwa_idx", "")
+        def output_name_closure = "${meta.id}.${original_ref_basename_closure}"
+        return "${output_name_closure}.bam.bai"
+    }, emit: bam
 
     publishDir "${params.outdir}/bwa_alignments", pattern: "*.{bam,bam.bai}", mode: "copy"
 
