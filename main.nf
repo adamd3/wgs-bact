@@ -21,6 +21,7 @@ include { SRA                     } from './workflows/sra'
 include { FASTP                   } from './modules/local/fastp/main.nf'
 include { SNIPPY; SNIPPY as SNIPPY_MERGED } from './modules/local/snippy'
 include { MERGE_FASTQ             } from './modules/local/merge_fastq/main.nf'
+include { BWA_INDEX; BWA_MEM             } from './modules/local/bwa/main.nf'
 include { CLEANUP_FASTQ_DIRS      } from './modules/local/cleanup_fastq_dirs/main.nf'
 include { PIPELINE_INITIALISATION; PIPELINE_COMPLETION } from './subworkflows/local/utils_wgs_bact_pipeline'
 
@@ -42,6 +43,16 @@ workflow WGS_BACT {
 
     main:
 
+    // Index reference genome for BWA if alignment is enabled
+    Channel.of(file(params.reference_genome))
+        .set { reference_genome_ch }
+
+    def indexed_reference_ch = Channel.empty()
+    if (params.align_reads) {
+        BWA_INDEX ( reference_genome_ch.map { it } )
+        indexed_reference_ch = BWA_INDEX.out.index.combine(BWA_INDEX.out.indexed_reference)
+    }
+
     //
     // WORKFLOW: Download FastQ files for SRA / ENA / GEO / DDBJ ids
     //
@@ -62,20 +73,40 @@ workflow WGS_BACT {
         new_meta.id = original_meta.run_accession // Use run_accession as the primary ID for individual runs
         [ new_meta, reads ]
     } )
+    .set { fastp_output }
+
+    def snippy_results_ch = Channel.empty()
+    def bwa_results_ch = Channel.empty()
+    def snippy_merged_results_ch = Channel.empty()
 
     //
-    // MODULE: Run Snippy to call variants
+    // MODULE: Run Snippy to call variants if enabled
     //
-    SNIPPY (
-        FASTP.out.reads.map { original_meta, reads -> [ original_meta, reads, reference_genome, null, original_meta.run_accession ] }
-    )
+    if (params.call_vars) {
+        SNIPPY (
+            fastp_output.out.reads.map { original_meta, reads -> [ original_meta, reads, reference_genome, null, original_meta.run_accession ] }
+        )
+        snippy_results_ch = SNIPPY.out.snippy_results
+    }
+
+    //
+    // MODULE: Run BWA-MEM to align reads if enabled
+    //
+    if (params.align_reads) {
+        BWA_MEM (
+            fastp_output.out.reads
+                .combine(indexed_reference_ch.first()) // .first() to get the indexed reference once
+                .map { original_meta, reads, indexed_ref_dir, indexed_ref_fasta -> [ original_meta, reads, indexed_ref_fasta ] } // Pass indexed_ref_fasta to BWA_MEM
+        )
+        bwa_results_ch = BWA_MEM.out.bam // Change from .sam to .bam
+    }
 
     //
     // Group FASTQ files by sample_accession and merge them
     //
-    def snippy_merged_completion = Channel.value(true)
-    if (params.merge) {
-        FASTP.out.reads
+    def snippy_merged_completion_signal = Channel.value(true) // Initialize to true for scenarios where merge and call_vars are false
+    if (params.merge && params.call_vars) {
+        fastp_output.out.reads
             .filter { meta, reads -> // Apply instrument_platform filter
                 if (params.instrument_platform_filter == 'ALL') {
                     return true
@@ -126,14 +157,15 @@ workflow WGS_BACT {
         SNIPPY_MERGED (
             MERGE_FASTQ.out.merged_reads.map { meta, reads -> [ meta, reads, reference_genome, "merged", meta.id ] }
         )
-        snippy_merged_completion = SNIPPY_MERGED.out.snippy_results.last()
+            snippy_merged_results_ch = SNIPPY_MERGED.out.snippy_results
     }
 
 
     // Emit a signal when the workflow is done
     // This channel will only emit once all upstream processes have completed
-    SNIPPY.out.snippy_results.last()
-        .mix(snippy_merged_completion)
+    snippy_results_ch
+        .mix(bwa_results_ch)
+        .mix(snippy_merged_results_ch)
         .collect()
         .map { true }
         .set { done_signal }
