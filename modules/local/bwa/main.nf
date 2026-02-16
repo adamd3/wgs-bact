@@ -30,13 +30,14 @@ process BWA_MEM {
     tuple val(meta), path(reads), path(indexed_ref_dir), path(indexed_fasta_path)
 
     output:
-    tuple val(meta), path("${name}.bam"), path("${name}.bam.bai"), emit: bam
+    def original_ref_basename = indexed_ref_dir.baseName.replace(".bwa_idx", "") // This definition is now here
+    def output_name = "${meta.id}.${original_ref_basename}"                  // This definition is now here
+    tuple val(meta), path("${output_name}.bam"), path("${output_name}.bam.bai"), emit: bam
 
     publishDir "${params.outdir}/bwa_alignments", pattern: "*.{bam,bam.bai}", mode: "copy"
 
     script:
-    def original_ref_basename = indexed_ref_dir.baseName.replace(".bwa_idx", "") // e.g., GCF_000016305.1_ASM1630v1_genomic
-    def name = "${meta.id}.${original_ref_basename}"
+    def name = output_name // Keep 'name' for script context convenience
 
     if (meta.single_end) {
         """
