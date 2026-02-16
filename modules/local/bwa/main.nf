@@ -47,7 +47,8 @@ process BWA_MEM {
     publishDir "${params.outdir}/bwa_alignments", pattern: "*.{bam,bam.bai}", mode: "copy"
 
     script:
-    def name = output_name // Keep 'name' for script context convenience
+    def original_ref_basename = indexed_ref_dir.baseName.replace(".bwa_idx", "")
+    def name = "${meta.id}.${original_ref_basename}"
 
     if (meta.single_end) {
         """
