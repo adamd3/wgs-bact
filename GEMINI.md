@@ -27,7 +27,7 @@ The new functionality introduces the following:
     *   If `--call_vars` is `true`, `SNIPPY` is executed on individual trimmed FASTQ files. If `--merge` is also `true`, `SNIPPY` is run on merged samples as well.
     *   If `--align_reads` is `true`, `BWA_INDEX` is run on the provided reference genome, followed by `BWA_MEM` to align trimmed FASTQ files against the indexed reference.
 3.  **BWA Module:** A new local Nextflow module for `BWA` has been created, including:
-    *   `BWA_INDEX` process: Indexes the reference genome. Includes a validation step to ensure the reference is in FASTA format.
+    *   `BWA_INDEX` process: Indexes the reference genome. Includes a validation step to ensure the reference is in FASTA format. Its output (the BWA index files and the copied reference genome) is published to `params.outdir/bwa_alignments`.
     *   `BWA_MEM` process: Aligns trimmed reads to the indexed reference, producing sorted and indexed BAM files (`.bam`, `.bam.bai`). This process uses multithreading and publishes outputs to `params.outdir/bwa_alignments`.
     *   A `conda` environment file (`modules/local/bwa/environment.yml`) containing `bwa` and `samtools` dependencies.
 4.  **Robustness and Scoping:** Several iterations of bug fixes have been applied to ensure correct variable scoping and channel handling within Nextflow's DSL, particularly for dynamic output naming and tool execution. These fixes address issues like `No such variable`, `Missing output file(s) null.bam`, and `bwa_idx_load_from_disk` errors, ensuring reliable execution.

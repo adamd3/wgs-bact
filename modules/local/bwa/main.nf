@@ -13,6 +13,8 @@ process BWA_INDEX {
     path "${reference.baseName}.bwa_idx" , emit: index
     path "${reference.baseName}.bwa_idx/${reference.name}" , emit: indexed_reference
 
+    publishDir "${params.outdir}/bwa_alignments", pattern: "${reference.baseName}.bwa_idx", mode: "copy"
+
     script:
     """
     mkdir ${reference.baseName}.bwa_idx
