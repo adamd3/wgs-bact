@@ -88,6 +88,16 @@
                     "format": "file-path",
                     "description": "Path to the reference genome file in FASTA or GENBANK format. If GENBANK is provided, snippy variant calls will include variant effect annotations from SnpEff."
                 },
+                "call_vars": {
+                    "type": "boolean",
+                    "description": "Set to true to call variants using Snippy. Set to false to skip variant calling.",
+                    "default": true
+                },
+                "align_reads": {
+                    "type": "boolean",
+                    "description": "Set to true to align reads using BWA. Requires a FASTA reference genome.",
+                    "default": false
+                },
                 "fastp_args": {
                     "type": ["string", "null"],
                     "description": "Extra arguments to pass to fastp."
