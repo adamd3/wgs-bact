@@ -84,7 +84,7 @@ workflow WGS_BACT {
     //
     if (params.call_vars) {
         SNIPPY (
-            fastp_output.out.reads.map { original_meta, reads -> [ original_meta, reads, reference_genome, null, original_meta.run_accession ] }
+            fastp_output.map { original_meta, reads -> [ original_meta, reads, reference_genome, null, original_meta.run_accession ] }
         )
         snippy_results_ch = SNIPPY.out.snippy_results
     }
@@ -94,7 +94,7 @@ workflow WGS_BACT {
     //
     if (params.align_reads) {
         BWA_MEM (
-            fastp_output.out.reads
+            fastp_output
                 .combine(indexed_reference_ch.first()) // .first() to get the indexed reference once
                 .map { original_meta, reads, indexed_ref_dir, indexed_ref_fasta -> [ original_meta, reads, indexed_ref_fasta ] } // Pass indexed_ref_fasta to BWA_MEM
         )
@@ -106,7 +106,7 @@ workflow WGS_BACT {
     //
     def snippy_merged_completion_signal = Channel.value(true) // Initialize to true for scenarios where merge and call_vars are false
     if (params.merge && params.call_vars) {
-        fastp_output.out.reads
+        fastp_output
             .filter { meta, reads -> // Apply instrument_platform filter
                 if (params.instrument_platform_filter == 'ALL') {
                     return true
