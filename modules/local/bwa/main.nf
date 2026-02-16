@@ -10,13 +10,13 @@ process BWA_INDEX {
 
     output:
     path "${reference.baseName}.bwa_idx" , emit: index
-    path "${reference.baseName}.fna"    , emit: indexed_reference
+    path "${reference.baseName}.bwa_idx/${reference.name}" , emit: indexed_reference
 
     script:
     """
     mkdir ${reference.baseName}.bwa_idx
-    cp ${reference} ${reference.baseName}.fna
-    bwa index ${reference.baseName}.fna
+    cp ${reference} ${reference.baseName}.bwa_idx/${reference.name}
+    bwa index ${reference.baseName}.bwa_idx/${reference.name}
     """
 }
 
