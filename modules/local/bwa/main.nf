@@ -32,7 +32,19 @@ process BWA_MEM {
     output:
     def original_ref_basename = indexed_ref_dir.baseName.replace(".bwa_idx", "") // This definition is now here
     def output_name = "${meta.id}.${original_ref_basename}"                  // This definition is now here
-    tuple val(meta), path("${output_name}.bam"), path("${output_name}.bam.bai"), emit: bam
+    tuple val(meta), path(
+        {
+            def original_ref_basename_closure = indexed_ref_dir.baseName.replace(".bwa_idx", "")
+            def output_name_closure = "${meta.id}.${original_ref_basename_closure}"
+            return "${output_name_closure}.bam"
+        }.call()
+    ), path(
+        {
+            def original_ref_basename_closure = indexed_ref_dir.baseName.replace(".bwa_idx", "")
+            def output_name_closure = "${meta.id}.${original_ref_basename_closure}"
+            return "${output_name_closure}.bam.bai"
+        }.call()
+    ), emit: bam
 
     publishDir "${params.outdir}/bwa_alignments", pattern: "*.{bam,bam.bai}", mode: "copy"
 
