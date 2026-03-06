@@ -48,6 +48,18 @@ To process samples from all available instrument platforms, set this parameter t
 
 Default: `ILLUMINA`
 
+#### `--call_vars`
+
+Set to `true` (default) to perform variant calling using Snippy on each individual run.
+
+#### `--align_reads`
+
+Set to `true` to perform read alignment using BWA against the reference genome. Default: `false`.
+
+#### `--merge`
+
+Set to `true` to merge FASTQ files from the same BioSample (accession) and perform an additional round of variant calling on the merged reads. Default: `false`.
+
 ### SRR / ERR / DRR ids
 
 If `SRR`/`ERR`/`DRR` run ids are provided then these will be resolved back to their appropriate `SRX`/`ERX`/`DRX` ids to be able to merge multiple runs from the same experiment. This is conceptually the same as merging multiple libraries sequenced from the same sample.

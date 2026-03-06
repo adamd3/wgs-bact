@@ -55,6 +55,18 @@ To process samples from all available instrument platforms, set this parameter t
 
 Default: `ILLUMINA`
 
+#### `--call_vars`
+
+Set to `true` (default) to perform variant calling using Snippy on each individual run.
+
+#### `--align_reads`
+
+Set to `true` to perform read alignment using BWA against the reference genome. Default: `false`.
+
+#### `--merge`
+
+Set to `true` to merge FASTQ files from the same BioSample (accession) and perform an additional round of variant calling on the merged reads. Default: `false`.
+
 ### Supported ids
 
 SRA / ENA / DDBJ / GEO ids
