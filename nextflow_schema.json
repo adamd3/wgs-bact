@@ -149,7 +149,7 @@
                 "merge": {
                     "type": "boolean",
                     "description": "Merge FASTQ files from the same biosample accession if multiple runs are found.",
-                    "default": true
+                    "default": false
                 }
             }
         },
