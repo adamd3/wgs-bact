@@ -121,12 +121,17 @@ workflow WGS_BACT {
             .map { meta, reads -> [ meta.sample_accession, meta, reads ] } // Revert to grouping only by sample_accession
             .groupTuple(by: [0]) // Group by sample_accession
             .map { sample_accession, meta_list, reads_list ->
+                // Sort runs alphabetically by run_accession to ensure deterministic merging
+                def sorted_pairs = [meta_list, reads_list].transpose().sort { a, b -> a[0].run_accession <=> b[0].run_accession }
+                def sorted_meta_list = sorted_pairs.collect { it[0] }
+                def sorted_reads_list = sorted_pairs.collect { it[1] }
+
                 def r1_files = []
                 def r2_files = []
                 def single_end = false
-                def merged_meta = meta_list[0].clone() // Take the first meta object as the representative for the merged sample
+                def merged_meta = sorted_meta_list[0].clone() // Take the first meta object as the representative for the merged sample
 
-                reads_list.each { reads ->
+                sorted_reads_list.each { reads ->
                     if (reads.size() == 1) {
                         r1_files << reads[0]
                         single_end = true
