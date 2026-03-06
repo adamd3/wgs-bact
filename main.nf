@@ -110,6 +110,19 @@ workflow WGS_BACT {
     //
     def snippy_merged_completion_signal = Channel.value(true) // Initialize to true for scenarios where merge and call_vars are false
     if (params.merge && params.call_vars) {
+        // Load merge table if provided (whitelist of sample_accession -> set of run_accession)
+        def merge_whitelist = [:]
+        if (params.merge_table) {
+            file(params.merge_table).splitCsv(header: true, sep: '\t').each { row ->
+                def sample = row.sample_accession
+                def run = row.run_accession
+                if (sample && run) {
+                    if (!merge_whitelist[sample]) merge_whitelist[sample] = [] as Set
+                    merge_whitelist[sample] << run
+                }
+            }
+        }
+
         FASTP.out.reads
             .filter { meta, reads -> // Apply instrument_platform filter
                 if (params.instrument_platform_filter == 'ALL') {
@@ -117,6 +130,13 @@ workflow WGS_BACT {
                 } else {
                     return meta.instrument_platform == params.instrument_platform_filter
                 }
+            }
+            .filter { meta, reads ->
+                // Apply whitelist filter if merge_table is provided
+                if (params.merge_table) {
+                    return merge_whitelist[meta.sample_accession]?.contains(meta.run_accession)
+                }
+                return true
             }
             .map { meta, reads -> [ meta.sample_accession, meta, reads ] } // Revert to grouping only by sample_accession
             .groupTuple(by: [0]) // Group by sample_accession

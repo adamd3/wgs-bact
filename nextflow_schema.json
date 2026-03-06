@@ -150,6 +150,14 @@
                     "type": "boolean",
                     "description": "Merge FASTQ files from the same biosample accession if multiple runs are found.",
                     "default": false
+                },
+                "merge_table": {
+                    "type": ["string", "null"],
+                    "format": "file-path",
+                    "mimetype": "text/tab-separated-values",
+                    "pattern": "^\\S+\\.(tsv|txt)$",
+                    "description": "Optional TSV file specifying specific runs to merge for a given sample. Whitelist: if provided, only samples and runs listed in this table will be merged.",
+                    "fa_icon": "fas fa-table"
                 }
             }
         },
