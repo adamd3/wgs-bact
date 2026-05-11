@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The pipeline has been set-up to automatically download and process the raw FastQ files from public repositories. Identifiers can be provided in a file, one-per-line via the `--input` parameter. Currently, the following types of example identifiers are supported:
+The pipeline has been set-up to automatically download and process the raw FastQ files from public repositories. Currently, the following types of example identifiers are supported:
 
 | `SRA`        | `ENA`        | `DDBJ`       | `GEO`      |
 | ------------ | ------------ | ------------ | ---------- |
@@ -13,6 +13,52 @@ The pipeline has been set-up to automatically download and process the raw FastQ
 | SRP256957    | ERP120836    | DRP004793    |            |
 | SRA1068758   | ERA2420837   | DRA008156    |            |
 | PRJNA625551  | PRJEB37513   | PRJDB4176    |            |
+
+### Pipeline Parameters
+
+#### `--input`
+
+File containing database identifiers, one per line, to download their associated metadata and FastQ files.
+
+Example `ids.csv`:
+
+```csv
+SAMN12345678
+SRR9984183
+SRR13191702
+ERR1160846
+ERR1109373
+DRR028935
+DRR026872
+```
+
+#### `--reference_genome`
+
+Path to the reference genome file in FASTA or GENBANK format. If GENBANK is provided, snippy variant calls will include variant effect annotations from SnpEff.
+
+#### `--outdir`
+
+The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.
+
+#### `--instrument_platform_filter`
+
+Use this parameter to filter input samples based on their sequencing instrument platform.
+By default, the pipeline will only process samples from the 'ILLUMINA' platform (`--instrument_platform_filter ILLUMINA`).
+To process samples from all available instrument platforms, set this parameter to `'ALL'` (`--instrument_platform_filter ALL`).
+
+Default: `ILLUMINA`
+
+#### `--call_vars`
+
+Set to `true` (default) to perform variant calling using Snippy on each individual run.
+
+#### `--align_reads`
+
+Set to `true` to perform read alignment using BWA against the reference genome. Default: `false`.
+
+#### `--merge`
+
+Set to `true` to merge FASTQ files from the same BioSample (accession) and perform an additional round of variant calling on the merged reads. Default: `false`.
 
 ### SRR / ERR / DRR ids
 
@@ -29,6 +75,16 @@ If you have a GEO accession (found in the data availability section of published
 - Select the desired samples in the `SRA Run Selector` and then download the `Accession List`
 
 This downloads a text file called `SRR_Acc_List.txt` that can be directly provided to the pipeline once renamed with a .csv extension e.g. `--input SRR_Acc_List.csv`.
+
+## Pipeline Parameters
+
+#### `--instrument_platform_filter`
+
+Use this parameter to filter input samples based on their sequencing instrument platform.
+By default, the pipeline will only process samples from the 'ILLUMINA' platform (`--instrument_platform_filter ILLUMINA`).
+To process samples from all available instrument platforms, set this parameter to `'ALL'` (`--instrument_platform_filter ALL`).
+
+Default: `ILLUMINA`
 
 ### Samplesheet format
 

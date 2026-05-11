@@ -8,15 +8,18 @@ process SNIPPY {
         'quay.io/biocontainers/snippy:4.6.0--hdfd78af_1' }"
 
     input:
-    tuple val(meta), path(reads_list), path(reference)
+    tuple val(meta), path(reads_list), path(reference), val(suffix), val(process_id)
 
     output:
-    tuple val(meta), path("${meta.id}_snippy") , emit: snippy_results
+    tuple val(meta), path("${process_id}${suffix ? '_' + suffix : ''}_snippy") , emit: snippy_results
     path "versions.yml"                       , emit: versions
 
     script:
     def args = task.ext.args ?: params.snippy_args
-    def prefix = task.ext.prefix ?: meta.id
+    // Removed cleanup_arg, as it seems to be causing issues with publishDir and missing files.
+    // The user can control overall cleanup behavior via Nextflow's own mechanisms if desired.
+    def cleanup_arg = '' 
+    def prefix = task.ext.prefix ?: "${process_id}${suffix ? '_' + suffix : ''}"
 
     """
     echo "--- SNIPPY Debug Info ---"
@@ -40,6 +43,7 @@ process SNIPPY {
             --minfrac ${params.snippy_min_frac} \\
             --minqual ${params.snippy_min_qual} \\
             --maxsoft ${params.snippy_max_soft} \\
+            ${cleanup_arg} \\
             ${args} 2>&1 | tee snippy_output.log
         if [ \$? -ne 0 ]; then
             echo "Error: Snippy command failed. See snippy_output.log for details."
@@ -61,6 +65,7 @@ process SNIPPY {
             --minfrac ${params.snippy_min_frac} \\
             --minqual ${params.snippy_min_qual} \\
             --maxsoft ${params.snippy_max_soft} \\
+            ${cleanup_arg} \\
             ${args} 2>&1 | tee snippy_output.log
         if [ \$? -ne 0 ]; then
             echo "Error: Snippy command failed. See snippy_output.log for details."

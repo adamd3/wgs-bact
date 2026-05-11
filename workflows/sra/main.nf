@@ -62,7 +62,14 @@ workflow SRA {
                 return meta_clone
         }
         .unique()
-        .set { ch_sra_metadata }
+        .filter { original_meta -> // Apply instrument_platform filter here
+            if (params.instrument_platform_filter == 'ALL') {
+                return true
+            } else {
+                return original_meta.instrument_platform == params.instrument_platform_filter
+            }
+        }
+        .set { ch_sra_metadata } // Now ch_sra_metadata is filtered
 
     if (!params.skip_fastq_download) {
 
@@ -126,8 +133,8 @@ workflow SRA {
                     def reads = fastq instanceof List ? fastq.flatten() : [ fastq ]
                     def meta_clone = meta.clone()
 
-                    meta_clone.fastq_1 = reads[0] ? "${params.outdir}/fastq/${reads[0].getName()}" : ''
-                    meta_clone.fastq_2 = reads[1] && !meta.single_end ? "${params.outdir}/fastq/${reads[1].getName()}" : ''
+                    meta_clone.fastq_1 = reads[0] ? "${params.outdir}/fastq_raw/${reads[0].getName()}" : ''
+                    meta_clone.fastq_2 = reads[1] && !meta.single_end ? "${params.outdir}/fastq_raw/${reads[1].getName()}" : ''
 
                     return meta_clone
             }

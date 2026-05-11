@@ -7,21 +7,6 @@
 > [!NOTE]
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
-First, prepare a samplesheet with your input data that looks as follows:
-
-`ids.csv`:
-
-```csv
-SRR9984183
-SRR13191702
-ERR1160846
-ERR1109373
-DRR028935
-DRR026872
-```
-
-Each line represents a database id. Please see next section for supported ids.
-
 Now, you can run the pipeline using:
 
 ```bash
@@ -36,11 +21,59 @@ nextflow run adamd3/wgs-bact \
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
 > see [docs](https://nf-co.re/usage/configuration#custom-configuration-files).
 
-## Supported ids
+### Pipeline Parameters
+
+#### `--input`
+
+File containing database identifiers, one per line, to download their associated metadata and FastQ files.
+
+Example `ids.csv`:
+
+```csv
+SAMN12345678
+SRR9984183
+SRR13191702
+ERR1160846
+ERR1109373
+DRR028935
+DRR026872
+```
+
+#### `--reference_genome`
+
+Path to the reference genome file in FASTA or GENBANK format. If GENBANK is provided, snippy variant calls will include variant effect annotations from SnpEff.
+
+#### `--outdir`
+
+The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.
+
+#### `--instrument_platform_filter`
+
+Use this parameter to filter input samples based on their sequencing instrument platform.
+By default, the pipeline will only process samples from the 'ILLUMINA' platform (`--instrument_platform_filter ILLUMINA`).
+To process samples from all available instrument platforms, set this parameter to `'ALL'` (`--instrument_platform_filter ALL`).
+
+Default: `ILLUMINA`
+
+#### `--call_vars`
+
+Set to `true` (default) to perform variant calling using Snippy on each individual run.
+
+#### `--align_reads`
+
+Set to `true` to perform read alignment using BWA against the reference genome. Default: `false`.
+
+#### `--merge`
+
+Set to `true` to merge FASTQ files from the same BioSample (accession) and perform an additional round of variant calling on the merged reads. Default: `false`.
+
+### Supported ids
+
+SRA / ENA / DDBJ / GEO ids
+
+### What the pipeline does
 
 Via a single file of ids, provided one-per-line (see [example input file](https://raw.githubusercontent.com/nf-core/test-datasets/fetchngs/sra_ids_test.csv)) the pipeline performs the following steps:
-
-### SRA / ENA / DDBJ / GEO ids
 
 1. Resolve database ids back to appropriate experiment-level ids and to be compatible with the [ENA API](https://ena-docs.readthedocs.io/en/latest/retrieval/programmatic-access.html)
 2. Fetch extensive id metadata via ENA API

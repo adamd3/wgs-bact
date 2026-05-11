@@ -199,7 +199,7 @@ class DatabaseResolver:
         "PRJDB",
         "SAMD",
     }
-    _ENA_PREFIXES = {"ERR", "SRR", "SAMN", "DRR"}
+    _ENA_PREFIXES = {"ERR", "SRR", "SAMN", "DRR", "SAMEA"}
 
     @classmethod
     def expand_identifier(cls, identifier):
@@ -223,22 +223,24 @@ class DatabaseResolver:
             return cls._id_to_srx(identifier)
         elif prefix in cls._ENA_PREFIXES:
             return cls._id_to_erx(identifier)
-        else:
-            return [identifier]
-
     @classmethod
     def _content_check(cls, response, identifier):
         """Check that the response has content or terminate."""
+        if response is None:
+            logger.error(f"Failed to fetch content for id {identifier}. The request returned no response.")
+            return False
         if response.status == 204:
             logger.error(f"There is no content for id {identifier}. Maybe you lack the right " f"permissions?")
-            sys.exit(1)
+            return False
+        return True
 
     @classmethod
     def _id_to_srx(cls, identifier):
         """Resolve the identifier to SRA experiments."""
         params = {"id": identifier, "db": "sra", "rettype": "runinfo", "retmode": "text"}
         response = fetch_url(f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?{urlencode(params)}")
-        cls._content_check(response, identifier)
+        if not cls._content_check(response, identifier):
+            return []
         return [row["Experiment"] for row in open_table(response, delimiter=",")]
 
     @classmethod
@@ -247,7 +249,8 @@ class DatabaseResolver:
         ids = []
         params = {"term": identifier, "db": "sra", "retmode": "json"}
         response = fetch_url(f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?{urlencode(params)}")
-        cls._content_check(response, identifier)
+        if not cls._content_check(response, identifier):
+            return []
         r_json = json.loads(response.text())
         gsm_ids = r_json["esearchresult"]["idlist"]
         for gsm_id in gsm_ids:
@@ -260,7 +263,8 @@ class DatabaseResolver:
         ids = []
         params = {"id": identifier, "db": "gds", "retmode": "json", "retmax": 10}
         response = fetch_url(f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?{urlencode(params)}")
-        cls._content_check(response, identifier)
+        if not cls._content_check(response, identifier):
+            return []
         r_json = json.loads(response.text())
 
         for each in r_json["result"][identifier]["samples"][0:]:
@@ -273,7 +277,8 @@ class DatabaseResolver:
         ids = []
         params = {"term": identifier, "db": "gds", "retmode": "json"}
         response = fetch_url(f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?{urlencode(params)}")
-        cls._content_check(response, identifier)
+        if not cls._content_check(response, identifier):
+            return []
         r_json = json.loads(response.text())
         gds_uids = r_json["esearchresult"]["idlist"]
         for gds_uid in gds_uids:
@@ -290,7 +295,8 @@ class DatabaseResolver:
             "fields": ",".join(fields),
         }
         response = fetch_url(f"https://www.ebi.ac.uk/ena/portal/api/filereport?{urlencode(params)}")
-        cls._content_check(response, identifier)
+        if not cls._content_check(response, identifier):
+            return []
         return [row["experiment_accession"] for row in open_table(response, delimiter="\t")]
 
 
@@ -321,15 +327,20 @@ class ENAMetadataFetcher:
         """
         params = {**self._params, "accession": accession}
         response = fetch_url(f"https://www.ebi.ac.uk/ena/portal/api/filereport?{urlencode(params)}")
-        self._content_check(response, accession)
+        if not self._content_check(response, accession):
+            return []
         return open_table(response, delimiter="\t")
 
     @classmethod
     def _content_check(cls, response, identifier):
         """Check that the response has content or terminate."""
+        if response is None:
+            logger.error(f"Failed to fetch content for id {identifier}. The request returned no response.")
+            return False
         if response.status == 204:
             logger.error(f"There is no content for id {identifier}. Maybe you lack the right " f"permissions?")
-            sys.exit(1)
+            return False
+        return True
 
 
 def open_table(response, delimiter=","):
@@ -404,48 +415,45 @@ def fetch_url(url):
     max_num_attempts = 3  # Hardcode max number of request attempts
     attempt = 0
 
-    try:
-        with urlopen(url) as response:
-            return Response(response=response)
-
-    except HTTPError as e:
-        if e.status == 429:
-            # If the response is 429, sleep and retry
-            if "Retry-After" in e.headers:
-                retry_after = int(e.headers["Retry-After"])
+    while attempt < max_num_attempts:
+        try:
+            with urlopen(url) as response:
+                return Response(response=response)
+        except HTTPError as e:
+            if e.status == 429:
+                retry_after = int(e.headers.get("Retry-After", sleep_time))
                 logging.warning(f"Received 429 response from server. Retrying after {retry_after} seconds...")
                 time.sleep(retry_after)
-            else:
-                logging.warning(f"Received 429 response from server. Retrying in {sleep_time} seconds...")
-                time.sleep(sleep_time)
-                sleep_time *= 2  # Increment sleep time
-            attempt += 1
-            return fetch_url(url)  # Recursive call to retry request
-
-        elif e.status == 500:
-            # If the response is 500, sleep and retry max 3 times
-            if attempt <= max_num_attempts:
+            elif e.status == 500:
                 logging.warning(f"Received 500 response from server. Retrying in {sleep_time} seconds...")
                 time.sleep(sleep_time)
-                sleep_time *= 2
-                attempt += 1
-                return fetch_url(url)
             else:
-                logging.error("Exceeded max request attempts. Exiting.")
-                sys.exit(1)
+                logger.error(f"HTTPError: {e.status} {e.reason} for URL: {url}")
+                return None
+        except URLError as e:
+            logging.warning(f"URLError: {e.reason} for URL: {url}. Retrying in {sleep_time} seconds...")
+            time.sleep(sleep_time)
+        except Exception as e:
+            logger.error(f"An unexpected error occurred: {e} for URL: {url}")
+            return None
 
-    except URLError as e:
-        logger.error("We failed to reach a server.")
-        logger.error(f"Reason: {e.reason}")
-        sys.exit(1)
+        attempt += 1
+        sleep_time *= 2  # Exponential backoff
+
+    logger.error(f"Exceeded max request attempts ({max_num_attempts}). Failed to fetch URL: {url}")
+    return None
 
 
 def get_ena_fields():
     params = {"dataPortal": "ena", "format": "tsv", "result": "read_run"}
+    response = fetch_url(f"https://www.ebi.ac.uk/ena/portal/api/returnFields?{urlencode(params)}")
+    if response is None:
+        logger.error("Failed to fetch ENA metadata fields. Returning empty list.")
+        return []
     return [
         row["columnId"]
         for row in open_table(
-            fetch_url(f"https://www.ebi.ac.uk/ena/portal/api/returnFields?{urlencode(params)}"),
+            response,
             delimiter="\t",
         )
     ]
