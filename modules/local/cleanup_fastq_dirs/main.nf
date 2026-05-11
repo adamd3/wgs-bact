@@ -14,7 +14,6 @@ process CLEANUP_FASTQ_DIRS {
         rm -rf "${outdir}/fastq_raw"
         rm -rf "${outdir}/fastq_trimmed"
         rm -rf "${outdir}/fastq_merged"
-        rm -rf "${outdir}/fastp_reports"
         echo "Cleanup complete."
         """
     } else {
